@@ -12,31 +12,25 @@ const formSchema = z.object({
   password: z.string().min(8)
 })
 
+// TODO: refactor using useActionState when it's available
 const signup = async (formData: FormData) => {
   const validation = formSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password")
   })
 
-  // Return early if the form data is invalid
   if (!validation.success) {
-    return {
-      errors: validation.error.flatten().fieldErrors
-    }
+    redirect("/error")
   }
 
   const supabase = createClient()
   const { error } = await supabase.auth.signUp(validation.data)
 
   if (error) {
-    console.error(error)
-    return {
-      error: error.message
-    }
+    redirect("/error")
   }
 
   revalidatePath("/", "layout")
-  redirect("/")
-
+  redirect("/verify")
 }
 export default signup
