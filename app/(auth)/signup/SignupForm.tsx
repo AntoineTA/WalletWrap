@@ -79,7 +79,11 @@ const SignupForm = () => {
                 )}
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button 
+              type="submit"
+              className="w-full"
+              disabled={!form.formState.isValid}
+            >
               Create an account
             </Button>
           </div>

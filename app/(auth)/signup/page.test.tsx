@@ -48,4 +48,18 @@ describe('Signup', () => {
     await userEvent.tab()
     expect(screen.getByText('Password must be at least 8 characters long.')).toBeInTheDocument()
   })
+  it('prevents submission if a field is invalid', async () => {
+    render(<Signup />)
+    const emailInput = screen.getByLabelText('Email')
+    const passwordInput = screen.getByLabelText('Password')
+    await user.type(emailInput, 'invalid-email')
+    await user.type(passwordInput, 'password')
+    const submitButton = screen.getByRole('button', { name: 'Create an account' })
+    expect(submitButton).toBeDisabled()
+  })
+  it('prevents submission if the form is empty', async () => {
+    render(<Signup />)
+    const submitButton = screen.getByRole('button', { name: 'Create an account' })
+    expect(submitButton).toBeDisabled()
+  })
 })
