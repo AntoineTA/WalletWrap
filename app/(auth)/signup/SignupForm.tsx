@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
 import { Button } from "@/components/ui/button"
 
+import signup from "./actions"
+
 
 const formSchema = z.object({
   email: z.string().email({
@@ -40,7 +42,7 @@ const SignupForm = () => {
 
   return (
     <Form {...form}>
-      <form aria-label="signup form">
+      <form action={signup} aria-label="signup form">
           <div className="grid gap-4">
             <div className="grid gap-2">
               <FormField
