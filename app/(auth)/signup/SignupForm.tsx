@@ -16,8 +16,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
-import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+import { SubmitButton } from "@/components/ui/submit-button"
 
 import { createClient } from "@/utils/supabase/client"
 
@@ -31,7 +30,7 @@ const formSchema = z.object({
 })
 
 const SignupForm = () => {
-  const [pending, setPending] = useState(false)
+  const [isPending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const form = useForm({
@@ -43,6 +42,7 @@ const SignupForm = () => {
     mode: "onTouched"
   })
 
+  // TODO: refactor to use server action once useActionState is available
   const signup = async (values: z.infer<typeof formSchema>) => {
     setPending(true)
 
@@ -53,6 +53,7 @@ const SignupForm = () => {
 
     if (error) {
       console.error('Error creating user:', error)
+      setError(error.message)
     }
   }
 
@@ -97,27 +98,15 @@ const SignupForm = () => {
                 )}
               />
             </div>
-            {!pending && (
-              <Button 
-                type="submit"
-                className="w-full"
-                disabled={!form.formState.isValid}
-              >
-                Create an account
-              </Button>
-            )}
-            {pending && (
-              <Button 
-                type="submit"
-                className="w-full"
-                disabled
-              >
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Please wait
-              </Button>
-            )}
+            <SubmitButton 
+              className="w-full"
+              text={"Create an account"}
+              disabled={!form.formState.isValid}
+              isPending={isPending}
+            />
           </div>
       </form>
+      {error && <p className="text-destructive">{error}</p>}
     </Form>
   )
 }
