@@ -74,52 +74,54 @@ const SignupForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(signup)} aria-label="signup form">
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
-                        placeholder="name@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="grid gap-2">
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <PasswordInput
-                        className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <SubmitButton 
-              className="w-full"
-              text={"Create an account"}
-              disabled={!form.formState.isValid}
-              isPending={isPending}
-            />
-          </div>
+      <form
+        onSubmit={form.handleSubmit(signup)}
+        className="grid gap-4"
+        aria-label="signup form"
+      >
+        <div className="grid gap-2">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field, fieldState }) => (
+              <FormItem >
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
+                    placeholder="name@example.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid gap-2">
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <PasswordInput
+                    className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <SubmitButton 
+          className="w-full"
+          text={"Create an account"}
+          disabled={!form.formState.isValid}
+          isPending={isPending}
+        />
       </form>
       {error && (
         <Alert variant="destructive" className="mt-4">

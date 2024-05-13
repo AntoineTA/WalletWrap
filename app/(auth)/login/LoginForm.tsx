@@ -74,59 +74,61 @@ const LoginForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(login)} aria-label="login form">
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <FormField
-                control={form.control}
-                name="email"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-          </div>
-          <div className="grid gap-2">
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <div className="flex items-center">
-                      <FormLabel>Password</FormLabel>
-                      <Link
-                        href="/recover-password"
-                        className="ml-auto inline-block text-sm underline"
-                      >
-                        Forgot your password?
-                      </Link>
-                    </div>
-                    <FormControl>
-                      <PasswordInput
-                        className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <SubmitButton 
-              className="w-full"
-              text={"Login"}
-              disabled={!form.formState.isValid}
-              isPending={isPending}
-            />
-          </div>
+      <form
+        onSubmit={form.handleSubmit(login)}
+        className="grid gap-4"
+        aria-label="login form"
+      >
+        <div className="grid gap-2">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid gap-2">
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <div className="flex items-center">
+                  <FormLabel>Password</FormLabel>
+                  <Link
+                    href="/recover-password"
+                    className="ml-auto inline-block text-sm underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+                <FormControl>
+                  <PasswordInput
+                    className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <SubmitButton 
+          className="w-full"
+          text={"Login"}
+          disabled={!form.formState.isValid}
+          isPending={isPending}
+        />
       </form>
       {error && (
         <Alert variant="destructive" className="mt-4">
