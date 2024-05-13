@@ -1,7 +1,9 @@
 "use client"
 
+import Link from "next/link"
+
 import { useState } from "react"
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"
 
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,14 +28,14 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters long.",
-  }),
+  password: z.string().min(1, {
+    message: "Please enter your password."
+  })
 })
 
-const SignupForm = () => {
+const LoginForm = () => {
   const [isPending, setPending] = useState(false)
-  const [error, setError] = useState<{message: string, code?: number} | null>(null)
+  const [error, setError] = useState<{title: string, message: string} | null>(null)
   const router = useRouter()
 
   const form = useForm({
@@ -45,32 +47,37 @@ const SignupForm = () => {
     mode: "onTouched"
   })
 
-  // TODO: refactor to use server action once useActionState is available
-  const signup = async (values: z.infer<typeof formSchema>) => {
+  const login = async (values: z.infer<typeof formSchema>) => {
     setPending(true)
     setError(null)
 
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp(values)
+    const { error } = await supabase.auth.signInWithPassword(values)
 
     setPending(false)
 
     if (error) {
-      error.status === 422 ?
-        setError({message: "An account with this email already exists.", code: error.status}) :
-        setError({message: "An error occurred. Please try again.", code: error.status})
+      error.status === 400 ?
+        setError({
+          title: "Invalid email or password.",
+          message: "Please check your credentials and try again."
+        }) :
+        setError({
+          title: "An error occurred.", 
+          message: `${error.message} (code ${error.status})`
+        })
     }
     if (!error) {
-      router.push("/verify-email")
+      router.push("/budget")
     }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(signup)} aria-label="signup form">
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <FormField
+      <form onSubmit={form.handleSubmit(login)} aria-label="login form">
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <FormField
                 control={form.control}
                 name="email"
                 render={({ field, fieldState }) => (
@@ -79,7 +86,6 @@ const SignupForm = () => {
                     <FormControl>
                       <Input
                         className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
-                        placeholder="name@example.com"
                         {...field}
                       />
                     </FormControl>
@@ -87,14 +93,22 @@ const SignupForm = () => {
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="grid gap-2">
+          </div>
+          <div className="grid gap-2">
               <FormField
                 control={form.control}
                 name="password"
                 render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <div className="flex items-center">
+                      <FormLabel>Password</FormLabel>
+                      <Link
+                        href="/recover-password"
+                        className="ml-auto inline-block text-sm underline"
+                      >
+                        Forgot your password?
+                      </Link>
+                    </div>
                     <FormControl>
                       <PasswordInput
                         className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
@@ -108,7 +122,7 @@ const SignupForm = () => {
             </div>
             <SubmitButton 
               className="w-full"
-              text={"Create an account"}
+              text={"Login"}
               disabled={!form.formState.isValid}
               isPending={isPending}
             />
@@ -116,11 +130,11 @@ const SignupForm = () => {
       </form>
       {error && (
         <Alert variant="destructive" className="mt-4">
-          <AlertTitle>Something went wrong</AlertTitle>
-          <AlertDescription>{error?.message} (error {error?.code})</AlertDescription>
+          <AlertTitle>{error.title}</AlertTitle>
+          <AlertDescription>{error.message}</AlertDescription>
         </Alert>
       )}
     </Form>
   )
 }
-export default SignupForm
+export default LoginForm

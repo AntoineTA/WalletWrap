@@ -47,30 +47,30 @@ describe('Signup form', () => {
     render(<Signup />)
     const emailInput = screen.getByLabelText('Email')
     await user.type(emailInput, 'invalid-email')
-    await userEvent.tab()
+    await user.tab()
     expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
   })
   it('displays a message if the password is too short', async () => {
     render(<Signup />)
     const passwordInput = screen.getByLabelText('Password')
     await user.type(passwordInput, 'short')
-    await userEvent.tab()
+    await user.tab()
     expect(screen.getByText('Password must be at least 8 characters long.')).toBeInTheDocument()
   })
 })
 
 describe('Submit button', () => {
-  it('prevents submission if a field is invalid', async () => {
+  it('is initially disabled', async () => {
+    render(<Signup />)
+    const submitButton = screen.getByRole('button', { name: 'Create an account' })
+    expect(submitButton).toBeDisabled()
+  })
+  it('is disabled if a field is invalid', async () => {
     render(<Signup />)
     const emailInput = screen.getByLabelText('Email')
     const passwordInput = screen.getByLabelText('Password')
     await user.type(emailInput, 'invalid-email')
     await user.type(passwordInput, 'password')
-    const submitButton = screen.getByRole('button', { name: 'Create an account' })
-    expect(submitButton).toBeDisabled()
-  })
-  it('prevents submission if the form is empty', async () => {
-    render(<Signup />)
     const submitButton = screen.getByRole('button', { name: 'Create an account' })
     expect(submitButton).toBeDisabled()
   })
