@@ -33,7 +33,7 @@ const formSchema = z.object({
 
 const SignupForm = () => {
   const [isPending, setPending] = useState(false)
-  const [error, setError] = useState<{message: string, code?: number} | null>(null)
+  const [error, setError] = useState<{title: string, message: string} | null>(null)
   const router = useRouter()
 
   const form = useForm({
@@ -56,9 +56,16 @@ const SignupForm = () => {
     setPending(false)
 
     if (error) {
+      console.error(error)
       error.status === 422 ?
-        setError({message: "An account with this email already exists.", code: error.status}) :
-        setError({message: "An error occurred. Please try again.", code: error.status})
+        setError({
+          title: "Email already registered",
+          message: "Please use a different email to create an account."
+        }) :
+        setError({
+          title: "An error occurred.",
+          message: `${error.message} (code ${error.status})`
+        })
     }
     if (!error) {
       router.push("/verify-email")
@@ -116,8 +123,8 @@ const SignupForm = () => {
       </form>
       {error && (
         <Alert variant="destructive" className="mt-4">
-          <AlertTitle>Something went wrong</AlertTitle>
-          <AlertDescription>{error?.message} (error {error?.code})</AlertDescription>
+          <AlertTitle>{error.title}</AlertTitle>
+          <AlertDescription>{error.message}</AlertDescription>
         </Alert>
       )}
     </Form>
