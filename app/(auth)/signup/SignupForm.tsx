@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
 import { SubmitButton } from "@/components/ui/submit-button"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 import { createClient } from "@/utils/supabase/client"
 
@@ -31,7 +32,7 @@ const formSchema = z.object({
 
 const SignupForm = () => {
   const [isPending, setPending] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<{message: string, code?: number} | null>(null)
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -45,6 +46,7 @@ const SignupForm = () => {
   // TODO: refactor to use server action once useActionState is available
   const signup = async (values: z.infer<typeof formSchema>) => {
     setPending(true)
+    setError(null)
 
     const supabase = createClient()
     const { error } = await supabase.auth.signUp(values)
@@ -52,8 +54,9 @@ const SignupForm = () => {
     setPending(false)
 
     if (error) {
-      console.error('Error creating user:', error)
-      setError(error.message)
+      error.status === 422 ?
+        setError({message: "An account with this email already exists.", code: error.status}) :
+        setError({message: "An error occurred. Please try again.", code: error.status})
     }
   }
 
@@ -106,7 +109,12 @@ const SignupForm = () => {
             />
           </div>
       </form>
-      {error && <p className="text-destructive">{error}</p>}
+      {error && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertTitle>Something went wrong (error {error?.code})</AlertTitle>
+          <AlertDescription>{error?.message}</AlertDescription>
+        </Alert>
+      )}
     </Form>
   )
 }
