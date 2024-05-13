@@ -3,14 +3,9 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from 'next/navigation'
 
-import { z } from "zod"
-
 import { createClient } from "@/utils/supabase/server"
 
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8)
-})
+import formSchema from "./schemas"
 
 // TODO: refactor using useActionState when it's available
 const signup = async (formData: FormData) => {
@@ -20,6 +15,7 @@ const signup = async (formData: FormData) => {
   })
 
   if (!validation.success) {
+    console.error('Validation error:', validation.error)
     redirect("/error")
   }
 
@@ -27,6 +23,7 @@ const signup = async (formData: FormData) => {
   const { error } = await supabase.auth.signUp(validation.data)
 
   if (error) {
+    console.error('Error creating user:', error)
     redirect("/error")
   }
 
