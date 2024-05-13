@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation";
 
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -33,6 +34,7 @@ const formSchema = z.object({
 const SignupForm = () => {
   const [isPending, setPending] = useState(false)
   const [error, setError] = useState<{message: string, code?: number} | null>(null)
+  const router = useRouter()
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -57,6 +59,9 @@ const SignupForm = () => {
       error.status === 422 ?
         setError({message: "An account with this email already exists.", code: error.status}) :
         setError({message: "An error occurred. Please try again.", code: error.status})
+    }
+    if (!error) {
+      router.push("/verify-email")
     }
   }
 

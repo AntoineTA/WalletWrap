@@ -2,6 +2,15 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import Signup from "./page"
 
+// Mock useRouter:
+jest.mock("next/navigation", () => ({
+  useRouter() {
+    return {
+      prefetch: () => null
+    };
+  }
+}));
+
 const user = userEvent.setup()
 
 describe('Signup', () => {
@@ -17,7 +26,7 @@ describe('Signup', () => {
   })
 })
 
-describe('Signup', () => {
+describe('Signup form', () => {
   it('renders a form', () => {
     render(<Signup />)
     expect(screen.getByRole('form')).toBeInTheDocument()
@@ -48,6 +57,9 @@ describe('Signup', () => {
     await userEvent.tab()
     expect(screen.getByText('Password must be at least 8 characters long.')).toBeInTheDocument()
   })
+})
+
+describe('Submit button', () => {
   it('prevents submission if a field is invalid', async () => {
     render(<Signup />)
     const emailInput = screen.getByLabelText('Email')
