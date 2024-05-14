@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 
 const navLinks = [
   { href: "/budget", label: "Budget", icon: WalletCards },
-  { href: "/account", label: "Accounts", icon: HandCoins },
+  { href: "/accounts", label: "Accounts", icon: HandCoins },
   { href: "/settings", label: "Settings", icon: Settings },
 ]
 
