@@ -14,7 +14,7 @@ const AuthWidget = async () => {
     )
   } else {
     return (
-      <div className="flex gap-2">
+      <div className="flex gap-4">
         <Button variant="outline" asChild>
           <Link href="/login">Login</Link>
         </Button>

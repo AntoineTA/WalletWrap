@@ -7,7 +7,7 @@ import AuthWidget from "@/components/AuthWidget"
 const Landing = () => {
   return (
     <>
-    <header className="top-0 flex h-16 items-center justify-between gap-4 border-b px-8 md:px-12">
+    <header className="top-0 flex h-16 items-center justify-between gap-4 border-b px-6 md:px-12">
       <Logo />
       <AuthWidget />
     </header>
