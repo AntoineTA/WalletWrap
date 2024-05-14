@@ -33,4 +33,27 @@ const SideNav = () => {
     </nav>
   )
 }
-export { SideNav }
+
+const BottomNav = () => {
+  const pathname = usePathname()
+  const isActive = (path: string) => pathname === path
+
+  return (
+    <nav className="fixed bottom-0 w-full h-16 px-4 py-1 border-t bg-muted/40 flex items-center space-around md:hidden">
+      {navLinks.map(({ href, label, icon: Icon }) => (
+        <Link
+          key={href}
+          href={href}
+          className={cn(
+            isActive(href) ? "bg-muted text-primary" : "text-muted-foreground",
+            "flex flex-col items-center justify-center gap-1 w-full h-full transition-all rounded-sm"
+          )}
+        >
+          <Icon className="w-6 h-6" />
+          <span>{label}</span>
+        </Link>
+      ))}
+    </nav>
+  )
+}
+export { SideNav, BottomNav }

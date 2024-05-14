@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { SideNav } from "@/components/Navigation";
+import { SideNav, BottomNav } from "@/components/Navigation";
 
 export default function BudgetLayout({
   children,
@@ -20,7 +20,7 @@ export default function BudgetLayout({
           Main
           {children}
         </main>
-        <div className="fixed bottom-0 w-full h-12 border-t bg-muted/40 flex items-center space-around md:hidden">Nav mobile</div>
+        <BottomNav />
       </div>
     </div>
   )
