@@ -16,7 +16,7 @@ const SideNav = () => {
   const isActive = (path: string) => pathname === path
 
   return (
-    <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+    <nav className="grid items-start px-2 font-medium lg:px-4">
       {navLinks.map(({ href, label, icon: Icon }) => (
         <Link
           key={href}
@@ -26,7 +26,7 @@ const SideNav = () => {
             "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary"
           )}
         >
-          <Icon className="w-4 h-4" />
+          <Icon className="w-5 h-5" />
           <span>{label}</span>
         </Link>
       ))}
@@ -46,7 +46,7 @@ const BottomNav = () => {
           href={href}
           className={cn(
             isActive(href) ? "bg-muted text-primary" : "text-muted-foreground",
-            "flex flex-col items-center justify-center gap-1 w-full h-full transition-all rounded-sm"
+            "flex flex-col items-center justify-center gap-1 w-full h-full transition-all rounded-lg"
           )}
         >
           <Icon className="w-6 h-6" />
