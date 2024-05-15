@@ -1,5 +1,3 @@
-import Link from "next/link"
-
 import { SideNav, BottomNav } from "@/components/Navigation";
 
 export default function BudgetLayout({
