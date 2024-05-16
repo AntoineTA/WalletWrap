@@ -7,9 +7,13 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
-import SettingsField from "./SettingsField"
+import { createClient } from "@/utils/supabase/server"
 
-const Settings = () => {
+import ProfileSettings from "./ProfileSettings"
+
+const Settings = async () => {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
   return (
     <Card className="px-4">
       <CardHeader>
@@ -18,11 +22,7 @@ const Settings = () => {
       </CardHeader>
       <CardContent>
       <Separator />
-      <SettingsField
-        label="Username"
-        value="John Doe"
-        editAction={<p>Hello</p>}
-      />
+      {user && <ProfileSettings user={user} />}
       </CardContent>
     </Card>
   )

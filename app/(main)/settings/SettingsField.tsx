@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button"
 
 interface SettingsFieldProps {
   label: string
-  value: string
+  value: string | null
   editAction: React.ReactNode
-
 }
 
 const SettingsField: React.FC<SettingsFieldProps> = ({ label, value, editAction }) => {
