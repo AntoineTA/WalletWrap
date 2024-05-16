@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/client"
 import type { User } from "@supabase/supabase-js"
 
 import SettingsField from "./SettingsField"
+import UsernameField from "./UsernameField"
 
 const ProfileSettings = ({user}: {user: User}) => {
   const supabase = createClient()
@@ -37,14 +38,15 @@ const ProfileSettings = ({user}: {user: User}) => {
 
   return (
     <>
-      <SettingsField
-        label="Username"
-        value={username}
-        editAction={"Hello"}
-      />
+      <UsernameField currentUsername={username} />
       <SettingsField
         label="Email"
         value={user.email || null}
+        editAction={"Hello"}
+      />
+      <SettingsField
+        label="Password"
+        value="**********"
         editAction={"Hello"}
       />
     </>

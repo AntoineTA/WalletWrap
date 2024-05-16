@@ -16,7 +16,7 @@ const SettingsField: React.FC<SettingsFieldProps> = ({ label, value, editAction 
     <div className="flex items-center justify-between py-5 text-sm">
       <div className="flex flex-col gap-1">
         <div className="font-bold">{label}</div>
-        {!isEditing && <div>{value}</div>}
+        {!isEditing && <div>{value ? value : 'Not set'}</div>}
         {isEditing && 
           <div className="bg-muted">{editAction}</div>
         }
