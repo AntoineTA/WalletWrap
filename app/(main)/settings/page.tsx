@@ -11,6 +11,7 @@ import { createClient } from "@/utils/supabase/server"
 
 import UsernameField from "./UsernameField"
 import EmailField from "./EmailField"
+import PasswordField from "./PasswordField"
 
 const Settings = async () => {
   const supabase = createClient()
@@ -28,6 +29,7 @@ const Settings = async () => {
         <div className="mt-4 flex flex-col gap-6">
           <UsernameField currentUsername={user.user_metadata.username} />
           {user.email && <EmailField currentEmail={user.email} />}
+          <PasswordField />
         </div>
         }
         {error && <div>{error.message}</div>}
