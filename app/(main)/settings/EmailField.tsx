@@ -6,19 +6,19 @@ import { Input } from "@/components/ui/input"
 import  { createClient } from "@/utils/supabase/client"
 import EditButton from "./EditButton"
 
-interface UsernameFieldProps {
-  currentUsername: string | null
+interface EmailFieldProps {
+  currentEmail: string
 }
 
-const UsernameField:React.FC<UsernameFieldProps> = ({currentUsername}) => {
+const EmailField:React.FC<EmailFieldProps> = ({currentEmail}) => {
   const [isEditing, setEditing] = useState(false)
-  const [username, setUsername] = useState(currentUsername)
+  const [email, setEmail] = useState(currentEmail)
   const [error, setError] = useState<string | null>(null)
 
-  const saveUsername = async () => {
+  const saveEmail = async () => {
     const supabase = createClient()
     const { error } = await supabase.auth.updateUser({
-      data: { username: username }
+      email: email
     })
 
     if (error) {
@@ -27,28 +27,29 @@ const UsernameField:React.FC<UsernameFieldProps> = ({currentUsername}) => {
       setError(null)
       setEditing(false)
     }
+
   }
 
   return (
     <div className="settings-item">
       <div className="settings-field">
-        <div className="font-bold">Username</div>
+        <div className="font-bold">Email</div>
         {!isEditing && 
           <div className="py-1">
-            {username ? username : 'Not set'}
+            {email}
           </div>
         }
         {isEditing && 
           <div>
             <div className="flex w-full max-w-sm items-center space-x-2">
               <Input
-                type="text"
-                value={username || ""}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
-              <Button onClick={saveUsername}>Save</Button>
+              <Button onClick={saveEmail}>Save</Button>
             </div>
-            {error && <div className="text-red-500 font-bold mt-1">{error}</div>}
+              {error && <div className="text-red-500 font-bold mt-1">{error}</div>}
           </div>
         }
       </div>
@@ -56,4 +57,4 @@ const UsernameField:React.FC<UsernameFieldProps> = ({currentUsername}) => {
     </div>
   )
 }
-export default UsernameField
+export default EmailField
