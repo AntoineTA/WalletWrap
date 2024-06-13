@@ -16,6 +16,8 @@ import {
 import { PasswordInput } from "@/components/ui/password-input"
 import { SubmitButton } from "@/components/ui/submit-button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useToast } from "@/components/ui/use-toast"
+
 import EditButton from './EditButton'
 
 import { createClient } from "@/utils/supabase/client"
@@ -30,6 +32,7 @@ const PasswordField = () => {
   const [isEditing, setEditing] = useState(false)
   const [isPending, setPending] = useState(false)
   const [error, setError] = useState<{title: string, message: string} | null>(null)
+  const { toast } = useToast()
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -58,6 +61,10 @@ const PasswordField = () => {
     }
     if (!error) {
       setEditing(false)
+      toast({
+        title: "Success!",
+        description: "Your password has been updated successfully.",
+      })
     }
   }
 
@@ -94,7 +101,6 @@ const PasswordField = () => {
               />
               <SubmitButton
                 text={"Save"}
-                // disabled={!form.formState.isValid}
                 isPending={isPending}
               />
             </form>

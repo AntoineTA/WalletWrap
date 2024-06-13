@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -17,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { SubmitButton } from "@/components/ui/submit-button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useToast } from "@/components/ui/use-toast"
 import EditButton from './EditButton'
 
 import { createClient } from "@/utils/supabase/client"
@@ -35,7 +35,7 @@ const EmailField:React.FC<EmailFieldProps> = ({email}) => {
   const [isEditing, setEditing] = useState(false)
   const [isPending, setPending] = useState(false)
   const [error, setError] = useState<{title: string, message: string} | null>(null)
-  const router = useRouter()
+  const { toast } = useToast()
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -69,7 +69,11 @@ const EmailField:React.FC<EmailFieldProps> = ({email}) => {
         })
     }
     if (!error) {
-      router.push("/settings/verify-email")
+      setEditing(false)
+      toast({
+        title: "Confirmation needed",
+        description: "Please check your new email to confirm the change.",
+      })
     }
   }
 
@@ -106,7 +110,6 @@ const EmailField:React.FC<EmailFieldProps> = ({email}) => {
               />
               <SubmitButton
                 text={"Save"}
-                // disabled={!form.formState.isValid}
                 isPending={isPending}
               />
             </form>

@@ -16,6 +16,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { SubmitButton } from "@/components/ui/submit-button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useToast } from "@/components/ui/use-toast"
+
 import EditButton from './EditButton'
 
 import { createClient } from "@/utils/supabase/client"
@@ -39,6 +41,7 @@ const UsernameField:React.FC<UsernameFieldProps> = ({username}) => {
   const [isPending, setPending] = useState(false)
   const [value, setValue] = useState<string | undefined>(username)
   const [error, setError] = useState<{title: string, message: string} | null>(null)
+  const { toast } = useToast()
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -69,6 +72,10 @@ const UsernameField:React.FC<UsernameFieldProps> = ({username}) => {
     if (!error) {
       setValue(values.username)
       setEditing(false)
+      toast({
+        title: "Success!",
+        description: "Your username has been updated successfully.",
+      })
     }
   }
 
