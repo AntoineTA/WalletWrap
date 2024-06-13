@@ -10,6 +10,8 @@ import { Separator } from "@/components/ui/separator"
 import { createClient } from "@/utils/supabase/server"
 
 import UsernameField from "./UsernameField"
+import EmaiField from "./EmailField"
+import PasswordField from "./PasswordField"
 
 const Settings = async () => {
   const supabase = createClient()
@@ -26,6 +28,8 @@ const Settings = async () => {
         {user &&
         <div className="mt-4 flex flex-col gap-6">
           <UsernameField username={user.user_metadata.username} />
+          <EmaiField email={user.email} />
+          <PasswordField />
         </div>
         }
         {error && <div>{error.message}</div>}
