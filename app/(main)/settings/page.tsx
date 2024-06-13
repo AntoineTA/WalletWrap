@@ -12,6 +12,7 @@ import { createClient } from "@/utils/supabase/server"
 import UsernameField from "./UsernameField"
 import EmaiField from "./EmailField"
 import PasswordField from "./PasswordField"
+import MFAField from "./MFAField"
 
 const Settings = async () => {
   const supabase = createClient()
@@ -30,6 +31,7 @@ const Settings = async () => {
           <UsernameField username={user.user_metadata.username} />
           <EmaiField email={user.email} />
           <PasswordField />
+          <MFAField />
         </div>
         }
         {error && <div>{error.message}</div>}
