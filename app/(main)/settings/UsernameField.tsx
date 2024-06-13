@@ -80,53 +80,54 @@ const UsernameField:React.FC<UsernameFieldProps> = ({username}) => {
   }
 
   return (
-    <div className="flex items-start justify-between text-sm">
-      <div className="p-2 flex flex-col gap-2">
+    <div className="text-sm flex flex-col">
 
+      <div className="flex justify-between items-center">
         <div className="font-bold">Username</div>
-
-        {!isEditing &&
-          <div className="py-2">{value ? value : "Not set"}</div>
-        }
-
-        {isEditing &&
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(changeUsername)}
-              className="flex gap-4"
-            >
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <SubmitButton
-                text={"Save"}
-                disabled={!form.formState.isValid}
-                isPending={isPending}
-              />
-            </form>
-            {error && (
-              <Alert variant="destructive" className="mt-4">
-                <AlertTitle>{error.title}</AlertTitle>
-                <AlertDescription>{error.message}</AlertDescription>
-              </Alert>
-            )}
-          </Form>
-        }
-
+        <EditButton isEditing={isEditing} setEditing={setEditing} />
       </div>
-      <EditButton isEditing={isEditing} setEditing={setEditing} />
+
+      {!isEditing &&
+        <div  className="py-2">{value ? value : "Not set"}</div>
+      }
+
+      {isEditing &&
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(changeUsername)}
+            className="flex flex-col md:flex-row gap-4"
+          >
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field, fieldState }) => (
+                <FormItem className="w-full md:w-80"> 
+                  <FormControl>
+                    <Input
+                      className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <SubmitButton
+              className="w-full"
+              text={"Save Changes"}
+              disabled={!form.formState.isValid}
+              isPending={isPending}
+            />
+          </form>
+          {error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertTitle>{error.title}</AlertTitle>
+              <AlertDescription>{error.message}</AlertDescription>
+            </Alert>
+          )}
+        </Form>
+      }
+
     </div>
   )
 }

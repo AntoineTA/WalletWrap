@@ -69,10 +69,12 @@ const PasswordField = () => {
   }
 
   return (
-    <div className="flex items-start justify-between text-sm">
-      <div className="p-2 flex flex-col gap-2">
+      <div className="text-sm flex flex-col">
 
+      <div className="flex justify-between items-center">
         <div className="font-bold">Password</div>
+        <EditButton isEditing={isEditing} setEditing={setEditing} />
+      </div>
 
         {!isEditing &&
           <div className="py-2">********</div>
@@ -82,13 +84,13 @@ const PasswordField = () => {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(changePassword)}
-              className="flex gap-4"
+              className="flex flex-col md:flex-row gap-4"
             >
               <FormField
                 control={form.control}
                 name="password"
                 render={({ field, fieldState }) => (
-                  <FormItem>
+                  <FormItem className="w-full md:w-80">
                     <FormControl>
                       <PasswordInput
                         className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
@@ -100,7 +102,8 @@ const PasswordField = () => {
                 )}
               />
               <SubmitButton
-                text={"Save"}
+                text={"Save Changes"}
+                disabled={!form.formState.isValid}
                 isPending={isPending}
               />
             </form>
@@ -114,8 +117,6 @@ const PasswordField = () => {
         }
 
       </div>
-      <EditButton isEditing={isEditing} setEditing={setEditing} />
-    </div>
   )
 }
 export default PasswordField
