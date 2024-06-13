@@ -9,9 +9,14 @@ import { Separator } from "@/components/ui/separator"
 
 import { createClient } from "@/utils/supabase/server"
 
+import SettingsField from "./SettingsField"
 import UsernameField from "./UsernameField"
 import EmailField from "./EmailField"
 import PasswordField from "./PasswordField"
+import EditButton from "./EditButton"
+import EditForm from "./EditForm"
+
+import { changeUsername } from "./actions"
 
 const Settings = async () => {
   const supabase = createClient()
@@ -27,9 +32,11 @@ const Settings = async () => {
         <Separator />
         {user &&
         <div className="mt-4 flex flex-col gap-6">
-          <UsernameField currentUsername={user.user_metadata.username} />
-          {user.email && <EmailField currentEmail={user.email} />}
-          <PasswordField />
+          <SettingsField
+            label="Username"
+            value={user.user_metadata.username}
+            editAction={changeUsername}
+          />
         </div>
         }
         {error && <div>{error.message}</div>}
