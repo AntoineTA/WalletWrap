@@ -6,7 +6,11 @@ import Link from 'next/link'
 import { buttonVariants } from "@/components/ui/button"
 import EditButton from './EditButton'
 
-const MFAField = () => {
+interface MFAFieldProps {
+  hasMFA: boolean | undefined
+}
+
+const MFAField:React.FC<MFAFieldProps> = ({hasMFA}) => {
   const [isEditing, setEditing] = useState(false)
 
   return (
@@ -19,7 +23,7 @@ const MFAField = () => {
 
       <div className="py-2">
       {!isEditing &&
-        <div>Enable state</div>
+        <div>{hasMFA ? 'Active' : 'Inactive'}</div>
       }
 
       {isEditing &&

@@ -14,6 +14,21 @@ export default async function MainLayout({
   if (!user) {
     redirect("/login")
   } else {
+    // check if user need to enter MFA code
+    const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    
+    if (error) {
+      console.error(error)
+    }
+
+    if (!error) {
+      console.log(data)
+      if (data.nextLevel === 'aal2' && data.nextLevel !== data.currentLevel) {
+        redirect("/mfa/challenge")
+      }
+    }
+    
+
     return (
       <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <div className="hidden border-r bg-muted/40 md:block">

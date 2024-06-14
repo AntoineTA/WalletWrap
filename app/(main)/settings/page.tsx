@@ -31,7 +31,7 @@ const Settings = async () => {
           <UsernameField username={user.user_metadata.username} />
           <EmaiField email={user.email} />
           <PasswordField />
-          <MFAField />
+          <MFAField hasMFA={user.user_metadata.hasMFA} />
         </div>
         }
         {error && <div>{error.message}</div>}
