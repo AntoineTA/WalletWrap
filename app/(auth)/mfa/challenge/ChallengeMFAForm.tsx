@@ -37,6 +37,7 @@ function ChallengeMFA() {
         })
 
         if (error) {
+          console.log(error.code)
           setError(error.message)
         }
 
