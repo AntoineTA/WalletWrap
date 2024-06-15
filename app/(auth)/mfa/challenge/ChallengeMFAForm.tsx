@@ -8,52 +8,58 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 import { createClient } from '@/utils/supabase/client'
 
 function ChallengeMFA() {
   const [verificationCode, setVerificationCode] = useState('')
-  const [error, setError] = useState('')
+  const [error, setError] = useState<{title: string, message: string} | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
   const handleInput = async (value: string) => {
     if (value.length === 6) {
-      setError('')
+      setError(null)
 
       const factors = await supabase.auth.mfa.listFactors()
 
       if (factors.error) {
         console.error(factors.error)
-        setError(factors.error.message)
+        setError({
+          title: "An error occurred.", 
+          message: `${factors.error.message} (code ${factors.error.status})`
+        })
       }
 
       if (!factors.error) {
-        const totpFactor = factors.data.totp[0]
-
-        const { data, error } = await supabase.auth.mfa.challengeAndVerify({
-          factorId: totpFactor.id,
+        const { error } = await supabase.auth.mfa.challengeAndVerify({
+          factorId: factors.data.totp[0].id,
           code: value,
         })
 
         if (error) {
-          console.log(error.code)
-          setError(error.message)
+          error.status === 422 ?
+            setError({
+              title: "Invalid verification code.",
+              message: "Please check your 6-digit code and try again."
+            }) :
+            setError({
+              title: "An error occurred.", 
+              message: `${error.message} (code ${error.status})`
+            })
         }
 
         if (!error) {
           router.push('/budget')
         }
       }
-
-
     }
-
-
-
   }
 
   return (
+    <>
+    <div className="flex justify-center">
     <InputOTP 
       maxLength={6}
       onChange={(value) => handleInput(value)}
@@ -67,6 +73,14 @@ function ChallengeMFA() {
         <InputOTPSlot index={5} />
       </InputOTPGroup>
     </InputOTP>
+    </div>
+    {error && (
+      <Alert variant="destructive" className="mt-4">
+        <AlertTitle>{error.title}</AlertTitle>
+        <AlertDescription>{error.message}</AlertDescription>
+      </Alert>
+    )}
+    </>
   )
 }
 export default ChallengeMFA

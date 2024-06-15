@@ -12,10 +12,10 @@ import ChallengeMFAForm from "./ChallengeMFAForm"
 const ChallengeMFA = () => {
   return (
     <Card className="mx-auto max-w-lg" data-testid="ChallengeMFA-card">
-    <CardHeader>
+    <CardHeader className="text-center">
       <CardTitle className="text-2xl">Two-Factor Authentication</CardTitle>
       <CardDescription>
-        Enter the code from your authenticator app to complete the process.
+        Enter the code from your authenticator app to login.
       </CardDescription>
     </CardHeader>
     <CardContent>

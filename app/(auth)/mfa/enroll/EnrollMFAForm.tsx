@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 import {
   InputOTP,
@@ -34,7 +35,7 @@ const EnrollMFAForm = () => {
       error.status === 422 ?
         setError({
           title: "Invalid verification code.",
-          message: "Please check the code provided by your authenticator and try again."
+          message: "Please check your 6-digit code and try again."
         }) :
         setError({
           title: "An error occurred.", 
@@ -73,7 +74,7 @@ const EnrollMFAForm = () => {
         setQR(data.totp.qr_code)
       }
     })()
-  }, [])
+  }, [supabase])
 
   return (
     <div>
@@ -94,12 +95,23 @@ const EnrollMFAForm = () => {
             <InputOTPSlot index={5} />
           </InputOTPGroup>
         </InputOTP>
+
+        <div className="flex justify-center space-around gap-4">
+        <Button 
+          onClick={() => router.push('/settings')}
+          variant="secondary"
+          className="w-1/2"
+        >
+          Cancel
+        </Button>
         <Button 
           onClick={enrollMFA}
           disabled={verificationCode.length !== 6}
+          className="w-1/2"
         >
-          Verify
+          Add 2FA
         </Button>
+        </div>
       </div>
     </div>
     {error && (

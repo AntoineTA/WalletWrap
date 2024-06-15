@@ -22,12 +22,10 @@ export default async function MainLayout({
     }
 
     if (!error) {
-      console.log(data)
       if (data.nextLevel === 'aal2' && data.nextLevel !== data.currentLevel) {
         redirect("/mfa/challenge")
       }
     }
-    
 
     return (
       <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">

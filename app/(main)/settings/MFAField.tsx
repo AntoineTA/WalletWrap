@@ -26,13 +26,20 @@ const MFAField:React.FC<MFAFieldProps> = ({hasMFA}) => {
         <div>{hasMFA ? 'Active' : 'Inactive'}</div>
       }
 
-      {isEditing &&
+      {isEditing && !hasMFA &&
         <Link 
           href="/mfa/enroll"
           className={buttonVariants({ variant: "default" })}
-          
         >
           Add 2FA
+        </Link>
+      }
+      {isEditing && hasMFA &&
+        <Link 
+          href="/mfa/enroll"
+          className={buttonVariants({ variant: "default" })}
+        >
+          Remove 2FA  
         </Link>
       }
       </div>
