@@ -36,7 +36,7 @@ const MFAField:React.FC<MFAFieldProps> = ({hasMFA}) => {
       }
       {isEditing && hasMFA &&
         <Link 
-          href="/mfa/enroll"
+          href="/mfa/unenroll"
           className={buttonVariants({ variant: "default" })}
         >
           Remove 2FA  
