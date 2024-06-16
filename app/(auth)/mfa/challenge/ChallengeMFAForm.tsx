@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 import {
   InputOTP,
@@ -15,7 +14,6 @@ import { createClient } from '@/utils/supabase/client'
 function ChallengeMFA() {
   const [verificationCode, setVerificationCode] = useState('')
   const [error, setError] = useState<{title: string, message: string} | null>(null)
-  const router = useRouter()
   const supabase = createClient()
 
   const handleInput = async (value: string) => {
@@ -25,7 +23,6 @@ function ChallengeMFA() {
       const factors = await supabase.auth.mfa.listFactors()
 
       if (factors.error) {
-        console.error(factors.error)
         setError({
           title: "An error occurred.", 
           message: `${factors.error.message} (code ${factors.error.status})`
@@ -33,25 +30,26 @@ function ChallengeMFA() {
       }
 
       if (!factors.error) {
-        const { error } = await supabase.auth.mfa.challengeAndVerify({
+        const challenge = await supabase.auth.mfa.challengeAndVerify({
           factorId: factors.data.totp[0].id,
           code: value,
         })
+        console.log(challenge)
 
-        if (error) {
-          error.status === 422 ?
+        if (challenge.error) {
+          challenge.error.status === 422 ?
             setError({
               title: "Invalid verification code.",
               message: "Please check your 6-digit code and try again."
             }) :
             setError({
               title: "An error occurred.", 
-              message: `${error.message} (code ${error.status})`
+              message: `${challenge.error.message} (code ${challenge.error.status})`
             })
         }
 
-        if (!error) {
-          router.push('/budget')
+        if (!challenge.error) {
+          window.location.href = '/budget'
         }
       }
     }
