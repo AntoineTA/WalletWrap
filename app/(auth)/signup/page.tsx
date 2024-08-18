@@ -12,7 +12,7 @@ import SignupForm from "./SignupForm";
 
 const Signup = () => {
   return (
-    <Card className="mx-auto max-w-sm" data-testid="signup-card">
+    <Card className="w-96" data-testid="signup-card">
       <CardHeader>
         <CardTitle className="text-2xl">Sign Up</CardTitle>
         <CardDescription>Start your budgeting journey today.</CardDescription>

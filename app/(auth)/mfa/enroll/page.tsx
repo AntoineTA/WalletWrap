@@ -11,7 +11,7 @@ import EnrollMFAForm from "./EnrollMFAForm";
 
 const EnrollMFA = () => {
   return (
-    <Card className="mx-auto max-w-lg" data-testid="EnrollMFA-card">
+    <Card data-testid="EnrollMFA-card">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">
           Add Two-Factor Authentication

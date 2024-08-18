@@ -12,7 +12,7 @@ import LoginForm from "./LoginForm";
 
 const Login = () => {
   return (
-    <Card className="mx-auto max-w-sm" data-testid="login-card">
+    <Card className="w-96" data-testid="login-card">
       <CardHeader>
         <CardTitle className="text-2xl">Log In</CardTitle>
         <CardDescription>
