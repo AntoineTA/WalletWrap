@@ -72,7 +72,6 @@ const EnrollMFAForm = () => {
       }
       if (!error) {
         setFactorId(data.id);
-        // setQR(data.totp.qr_code)
         setQR(data.totp.qr_code);
       }
     })();
