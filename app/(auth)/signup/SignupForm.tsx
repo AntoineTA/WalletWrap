@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import {
   Form,
@@ -14,13 +14,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { PasswordInput } from "@/components/ui/password-input"
-import { SubmitButton } from "@/components/ui/submit-button"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { SubmitButton } from "@/components/ui/submit-button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/utils/supabase/client";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -29,12 +29,14 @@ const formSchema = z.object({
   password: z.string().min(8, {
     message: "Password must be at least 8 characters long.",
   }),
-})
+});
 
 const SignupForm = () => {
-  const [isPending, setPending] = useState(false)
-  const [error, setError] = useState<{title: string, message: string} | null>(null)
-  const router = useRouter()
+  const [isPending, setPending] = useState(false);
+  const [error, setError] = useState<{ title: string; message: string } | null>(
+    null,
+  );
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -42,35 +44,35 @@ const SignupForm = () => {
       email: "",
       password: "",
     },
-    mode: "onTouched"
-  })
+    mode: "onTouched",
+  });
 
   // TODO: refactor to use server action once useActionState is available
   const signup = async (values: z.infer<typeof formSchema>) => {
-    setPending(true)
-    setError(null)
+    setPending(true);
+    setError(null);
 
-    const supabase = createClient()
-    const { error } = await supabase.auth.signUp(values)
+    const supabase = createClient();
+    const { error } = await supabase.auth.signUp(values);
 
-    setPending(false)
+    setPending(false);
 
     if (error) {
-      console.error(error)
-      error.status === 422 ?
-        setError({
-          title: "Email already registered",
-          message: "Please use a different email to create an account."
-        }) :
-        setError({
-          title: "An error occurred.",
-          message: `${error.message} (code ${error.status})`
-        })
+      console.error(error);
+      error.status === 422
+        ? setError({
+            title: "Email already registered",
+            message: "Please use a different email to create an account.",
+          })
+        : setError({
+            title: "An error occurred.",
+            message: `${error.message} (code ${error.status})`,
+          });
     }
     if (!error) {
-      router.push("/verify-email")
+      router.push("/verify-email");
     }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -84,11 +86,14 @@ const SignupForm = () => {
             control={form.control}
             name="email"
             render={({ field, fieldState }) => (
-              <FormItem >
+              <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
-                    className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
+                    className={
+                      fieldState.error &&
+                      "border-destructive focus-visible:ring-destructive"
+                    }
                     placeholder="name@example.com"
                     {...field}
                   />
@@ -107,7 +112,10 @@ const SignupForm = () => {
                 <FormLabel>Password</FormLabel>
                 <FormControl>
                   <PasswordInput
-                    className={fieldState.error && "border-destructive focus-visible:ring-destructive"}
+                    className={
+                      fieldState.error &&
+                      "border-destructive focus-visible:ring-destructive"
+                    }
                     {...field}
                   />
                 </FormControl>
@@ -116,7 +124,7 @@ const SignupForm = () => {
             )}
           />
         </div>
-        <SubmitButton 
+        <SubmitButton
           className="w-full"
           text={"Create an account"}
           disabled={!form.formState.isValid}
@@ -130,6 +138,6 @@ const SignupForm = () => {
         </Alert>
       )}
     </Form>
-  )
-}
-export default SignupForm
+  );
+};
+export default SignupForm;

@@ -1,29 +1,32 @@
-import { redirect } from "next/navigation"
+import { redirect } from "next/navigation";
 
-import { SideNav, BottomNav } from "@/components/Navigation"
-import { createClient } from "@/utils/supabase/server"
+import { SideNav, BottomNav } from "@/components/Navigation";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function MainLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login")
+    redirect("/login");
   } else {
     // check if user need to enter MFA code
-    const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-    
+    const { data, error } =
+      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
     if (error) {
-      console.error(error)
+      console.error(error);
     }
 
     if (!error) {
-      if (data.nextLevel === 'aal2' && data.nextLevel !== data.currentLevel) {
-        redirect("/mfa/challenge")
+      if (data.nextLevel === "aal2" && data.nextLevel !== data.currentLevel) {
+        redirect("/mfa/challenge");
       }
     }
 
@@ -43,6 +46,6 @@ export default async function MainLayout({
           <BottomNav />
         </div>
       </div>
-    )
+    );
   }
 }

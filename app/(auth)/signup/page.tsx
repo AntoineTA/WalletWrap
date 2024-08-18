@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "next/link";
 
 import {
   Card,
@@ -6,18 +6,16 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
-import SignupForm from "./SignupForm"
+import SignupForm from "./SignupForm";
 
 const Signup = () => {
   return (
     <Card className="mx-auto max-w-sm" data-testid="signup-card">
       <CardHeader>
         <CardTitle className="text-2xl">Sign Up</CardTitle>
-        <CardDescription>
-          Start your budgeting journey today.
-        </CardDescription>
+        <CardDescription>Start your budgeting journey today.</CardDescription>
       </CardHeader>
       <CardContent>
         <SignupForm />
@@ -29,6 +27,6 @@ const Signup = () => {
         </div>
       </CardContent>
     </Card>
-  )
-}
-export default Signup
+  );
+};
+export default Signup;

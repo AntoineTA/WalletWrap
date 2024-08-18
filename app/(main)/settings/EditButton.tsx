@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
 interface EditButtonProps {
-  isEditing: boolean
-  setEditing: (value: boolean) => void
-  }
+  isEditing: boolean;
+  setEditing: (value: boolean) => void;
+}
 
-const EditButton:React.FC<EditButtonProps> = ({isEditing, setEditing}) => {
+const EditButton: React.FC<EditButtonProps> = ({ isEditing, setEditing }) => {
   return (
     <Button
       variant="link"
@@ -16,6 +16,6 @@ const EditButton:React.FC<EditButtonProps> = ({isEditing, setEditing}) => {
     >
       {!isEditing ? "Edit" : "Cancel"}
     </Button>
-  )
-}
-export default EditButton
+  );
+};
+export default EditButton;

@@ -1,5 +1,5 @@
-import Link from "next/link"
-import { Wallet } from "lucide-react"
+import Link from "next/link";
+import { Wallet } from "lucide-react";
 
 const Branding = () => {
   return (
@@ -7,6 +7,6 @@ const Branding = () => {
       <Wallet className="h-8 w-8" />
       <span className="hidden text-xl font-bold ml-2 md:block">WalletWrap</span>
     </Link>
-  )
-}
-export default Branding
+  );
+};
+export default Branding;

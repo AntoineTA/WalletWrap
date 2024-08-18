@@ -1,13 +1,13 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/utils/supabase/server'
-import LogoutButton from './LogoutButton'
+import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
+import LogoutButton from "./LogoutButton";
 
 const Budget = async () => {
-  const supabase = createClient()
+  const supabase = createClient();
 
-  const { data, error } = await supabase.auth.getUser()
+  const { data, error } = await supabase.auth.getUser();
   if (error || !data?.user) {
-    redirect('/login')
+    redirect("/login");
   }
 
   return (
@@ -15,6 +15,6 @@ const Budget = async () => {
       Logged as {data.user.email}
       <LogoutButton />
     </div>
-  )
-}
-export default Budget
+  );
+};
+export default Budget;

@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "next/link";
 
 import {
   Card,
@@ -6,23 +6,24 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { buttonVariants } from "@/components/ui/button"
-import UnenrollMFAForm from "./UnenrollMFAForm"
+} from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
+import UnenrollMFAForm from "./UnenrollMFAForm";
 
 const UnenrollMFA = () => {
   return (
     <Card className="mx-auto max-w-lg" data-testid="UnenrollMFA-card">
-    <CardHeader className="text-center">
-      <CardTitle className="text-2xl">Remove Two-Factor Authentication</CardTitle>
-      <CardDescription>
-        Are you sure you want to remove two-factor authentication?
-      </CardDescription>
-    </CardHeader>
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl">
+          Remove Two-Factor Authentication
+        </CardTitle>
+        <CardDescription>
+          Are you sure you want to remove two-factor authentication?
+        </CardDescription>
+      </CardHeader>
       <UnenrollMFAForm />
-    <CardContent>
-    </CardContent>
+      <CardContent></CardContent>
     </Card>
-  )
-}
-export default UnenrollMFA
+  );
+};
+export default UnenrollMFA;
