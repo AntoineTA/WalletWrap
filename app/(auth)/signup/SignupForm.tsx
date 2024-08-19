@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ErrorAlert, Error } from "@/components/ui/error-alert";
 
 import { createClient } from "@/utils/supabase/client";
 
@@ -33,9 +33,7 @@ const formSchema = z.object({
 
 const SignupForm = () => {
   const [isPending, setPending] = useState(false);
-  const [error, setError] = useState<{ title: string; message: string } | null>(
-    null,
-  );
+  const [error, setError] = useState<Error | null>(null);
   const router = useRouter();
 
   const form = useForm({
@@ -47,7 +45,6 @@ const SignupForm = () => {
     mode: "onTouched",
   });
 
-  // TODO: refactor to use server action once useActionState is available
   const signup = async (values: z.infer<typeof formSchema>) => {
     setPending(true);
     setError(null);
@@ -66,7 +63,8 @@ const SignupForm = () => {
           })
         : setError({
             title: "An error occurred.",
-            message: `${error.message} (code ${error.status})`,
+            message: error.message,
+            code: error.status,
           });
     }
     if (!error) {
@@ -131,12 +129,7 @@ const SignupForm = () => {
           isPending={isPending}
         />
       </form>
-      {error && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertTitle>{error.title}</AlertTitle>
-          <AlertDescription>{error.message}</AlertDescription>
-        </Alert>
-      )}
+      {error && <ErrorAlert {...error} />}
     </Form>
   );
 };

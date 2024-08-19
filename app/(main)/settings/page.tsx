@@ -20,12 +20,15 @@ import MFAField from "./MFAField";
 import SkeletonFields from "./SkeletonFields";
 
 import type { User } from "@supabase/supabase-js";
+import { ErrorAlert, Error } from "@/components/ui/error-alert";
 
 const Settings = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<{ title: string; message: string } | null>(
-    null,
-  );
+  const [error, setError] = useState<{
+    title: string;
+    message: string;
+    code?: number;
+  } | null>({ title: "Error", message: "An error occurred.", code: 500 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -64,12 +67,7 @@ const Settings = () => {
             <MFAField hasMFA={user.user_metadata.hasMFA} />
           </div>
         )}
-        {error && (
-          <Alert variant="destructive" className="mt-4">
-            <AlertTitle>{error.title}</AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
-          </Alert>
-        )}
+        {error && <ErrorAlert {...error} />}
       </CardContent>
     </Card>
   );

@@ -9,28 +9,107 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      profiles: {
+      Accounts: {
         Row: {
-          id: string;
-          updated_at: string | null;
-          username: string | null;
+          balance: number;
+          budget: number;
+          created_at: string;
+          id: number;
+          name: string;
+          type: Database["public"]["Enums"]["account_types"];
         };
         Insert: {
-          id: string;
-          updated_at?: string | null;
-          username?: string | null;
+          balance?: number;
+          budget: number;
+          created_at?: string;
+          id?: number;
+          name: string;
+          type?: Database["public"]["Enums"]["account_types"];
         };
         Update: {
-          id?: string;
-          updated_at?: string | null;
-          username?: string | null;
+          balance?: number;
+          budget?: number;
+          created_at?: string;
+          id?: number;
+          name?: string;
+          type?: Database["public"]["Enums"]["account_types"];
         };
         Relationships: [
           {
-            foreignKeyName: "profiles_id_fkey";
-            columns: ["id"];
-            isOneToOne: true;
+            foreignKeyName: "Accounts_budget_fkey";
+            columns: ["budget"];
+            isOneToOne: false;
+            referencedRelation: "Budgets";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      Budgets: {
+        Row: {
+          created_at: string;
+          description: string;
+          id: number;
+          name: string;
+          user: string;
+        };
+        Insert: {
+          created_at?: string;
+          description: string;
+          id?: number;
+          name: string;
+          user: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string;
+          id?: number;
+          name?: string;
+          user?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "Budgets_user_fkey";
+            columns: ["user"];
+            isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      Transactions: {
+        Row: {
+          account: number | null;
+          amount: number;
+          created_at: string;
+          date: string;
+          id: number;
+          is_inflow: boolean;
+          note: string | null;
+        };
+        Insert: {
+          account?: number | null;
+          amount: number;
+          created_at?: string;
+          date?: string;
+          id?: number;
+          is_inflow?: boolean;
+          note?: string | null;
+        };
+        Update: {
+          account?: number | null;
+          amount?: number;
+          created_at?: string;
+          date?: string;
+          id?: number;
+          is_inflow?: boolean;
+          note?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "Transactions_account_fkey";
+            columns: ["account"];
+            isOneToOne: false;
+            referencedRelation: "Accounts";
             referencedColumns: ["id"];
           },
         ];
@@ -43,7 +122,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      account_types: "checking" | "saving" | "liability";
     };
     CompositeTypes: {
       [_ in never]: never;
