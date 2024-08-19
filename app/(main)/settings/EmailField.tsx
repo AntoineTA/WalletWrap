@@ -99,6 +99,7 @@ const EmailField: React.FC<EmailFieldProps> = ({ email }) => {
                 <FormItem className="w-full md:w-80">
                   <FormControl>
                     <Input
+                      data-testid="email-field"
                       className={
                         fieldState.error &&
                         "border-destructive focus-visible:ring-destructive"

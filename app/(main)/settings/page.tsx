@@ -19,7 +19,7 @@ import PasswordField from "./PasswordField";
 import MFAField from "./MFAField";
 import SkeletonFields from "./SkeletonFields";
 
-import type { AuthError, User } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 
 const Settings = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -30,7 +30,6 @@ const Settings = () => {
 
   useEffect(() => {
     (async () => {
-      console.log("Fetching user data...");
       const supabase = createClient();
 
       const {

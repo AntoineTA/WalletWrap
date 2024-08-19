@@ -90,6 +90,7 @@ const PasswordField = () => {
                 <FormItem className="w-full md:w-80">
                   <FormControl>
                     <PasswordInput
+                      data-testid="password-field"
                       className={
                         fieldState.error &&
                         "border-destructive focus-visible:ring-destructive"

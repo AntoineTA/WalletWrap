@@ -102,6 +102,7 @@ const UsernameField: React.FC<UsernameFieldProps> = ({ username }) => {
                 <FormItem className="w-full md:w-80">
                   <FormControl>
                     <Input
+                      data-testid="username-field"
                       className={
                         fieldState.error &&
                         "border-destructive focus-visible:ring-destructive"

@@ -66,7 +66,7 @@ describe("Signup form", () => {
 });
 
 describe("Submit button", () => {
-  it("is initially disabled", async () => {
+  it("is initially disabled", () => {
     render(<Signup />);
     const submitButton = screen.getByRole("button", {
       name: "Create an account",

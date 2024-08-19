@@ -12,7 +12,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { createClient } from "@/utils/supabase/client";
 
 function ChallengeMFA() {
-  const [verificationCode, setVerificationCode] = useState("");
   const [error, setError] = useState<{ title: string; message: string } | null>(
     null,
   );
