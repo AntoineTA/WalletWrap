@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import Link from "next/link";
 
@@ -5,7 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import EditButton from "./EditButton";
 
 interface MFAFieldProps {
-  hasMFA: boolean | undefined;
+  hasMFA: boolean;
 }
 
 const MFAField: React.FC<MFAFieldProps> = ({ hasMFA }) => {

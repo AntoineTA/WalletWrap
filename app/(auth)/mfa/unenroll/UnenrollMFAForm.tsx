@@ -3,52 +3,51 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { ErrorAlert, type Error } from "@/components/ui/error-alert";
 
 import { createClient } from "@/utils/supabase/client";
 
 export function UnenrollMFAForm() {
-  const [factorId, setFactorId] = useState("");
-  const [error, setError] = useState<{ title: string; message: string } | null>(
-    null,
-  );
+  const [error, setError] = useState<Error | null>(null);
   const supabase = createClient();
   const router = useRouter();
 
   const unenrollMFA = async () => {
     setError(null);
-    const { data, error } = await supabase.auth.mfa.listFactors();
 
-    if (error) {
-      setError({
-        title: "An error occurred.",
-        message: `${error.message} (code ${error.status})`,
-      });
-    }
+    try {
+      // Get the current user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not found");
 
-    if (!error) {
-      const unenroll = await supabase.auth.mfa.unenroll({
+      // Get the user's MFA factors
+      const { data, error: factorError } =
+        await supabase.auth.mfa.listFactors();
+      if (factorError) throw factorError;
+
+      // Unenroll the user from MFA
+      const { error: unenrollError } = await supabase.auth.mfa.unenroll({
         factorId: data.totp[0].id,
       });
+      if (unenrollError) throw unenrollError;
 
-      if (unenroll.error) {
-        setError({
-          title: "An error occurred.",
-          message: `${unenroll.error.message} (code ${unenroll.error.status})`,
-        });
-      } else {
-        const user = await supabase.auth.updateUser({
-          data: { hasMFA: false },
-        });
+      // Update the user's MFA status in settings
+      const { error: settingsError } = await supabase
+        .from("Settings")
+        .update({ has_mfa: false })
+        .eq("id", user.id);
+      if (settingsError) throw settingsError;
 
-        user.error
-          ? setError({
-              title: "An error occurred.",
-              message: `${user.error.message} (code ${user.error.status})`,
-            })
-          : router.push("/settings");
-      }
+      // If all went well, redirect to success page
+      router.push("/mfa/unenroll/success");
+    } catch (error) {
+      setError({
+        title: "An unexpected error occurred",
+        message: "Please try again.",
+      });
     }
   };
 
@@ -64,12 +63,7 @@ export function UnenrollMFAForm() {
       <Button onClick={unenrollMFA} variant="destructive" className="w-32">
         Remove 2FA
       </Button>
-      {error && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertTitle>{error.title}</AlertTitle>
-          <AlertDescription>{error.message}</AlertDescription>
-        </Alert>
-      )}
+      {error && <ErrorAlert {...error} />}
     </div>
   );
 }

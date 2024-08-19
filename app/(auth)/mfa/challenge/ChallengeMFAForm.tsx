@@ -7,14 +7,12 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ErrorAlert, Error } from "@/components/ui/error-alert";
 
 import { createClient } from "@/utils/supabase/client";
 
 function ChallengeMFA() {
-  const [error, setError] = useState<{ title: string; message: string } | null>(
-    null,
-  );
+  const [error, setError] = useState<Error | null>(null);
   const supabase = createClient();
 
   const handleInput = async (value: string) => {
@@ -26,7 +24,8 @@ function ChallengeMFA() {
       if (factors.error) {
         setError({
           title: "An error occurred.",
-          message: `${factors.error.message} (code ${factors.error.status})`,
+          message: factors.error.message,
+          code: factors.error.status,
         });
       }
 
@@ -45,7 +44,8 @@ function ChallengeMFA() {
               })
             : setError({
                 title: "An error occurred.",
-                message: `${challenge.error.message} (code ${challenge.error.status})`,
+                message: challenge.error.message,
+                code: challenge.error.status,
               });
         }
 
@@ -70,12 +70,7 @@ function ChallengeMFA() {
           </InputOTPGroup>
         </InputOTP>
       </div>
-      {error && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertTitle>{error.title}</AlertTitle>
-          <AlertDescription>{error.message}</AlertDescription>
-        </Alert>
-      )}
+      {error && <ErrorAlert {...error} />}
     </>
   );
 }

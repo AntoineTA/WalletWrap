@@ -76,6 +76,32 @@ export type Database = {
           },
         ];
       };
+      Settings: {
+        Row: {
+          has_mfa: boolean;
+          id: string;
+          username: string | null;
+        };
+        Insert: {
+          has_mfa?: boolean;
+          id: string;
+          username?: string | null;
+        };
+        Update: {
+          has_mfa?: boolean;
+          id?: string;
+          username?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "settings_id_fkey";
+            columns: ["id"];
+            isOneToOne: true;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       Transactions: {
         Row: {
           account: number | null;

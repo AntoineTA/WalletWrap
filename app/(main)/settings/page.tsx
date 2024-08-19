@@ -1,6 +1,3 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -9,46 +6,65 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ErrorAlert, Error } from "@/components/ui/error-alert";
 
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/server";
 
 import UsernameField from "./UsernameField";
 import EmaiField from "./EmailField";
 import PasswordField from "./PasswordField";
 import MFAField from "./MFAField";
-import SkeletonFields from "./SkeletonFields";
 
-import type { User } from "@supabase/supabase-js";
-import { ErrorAlert, Error } from "@/components/ui/error-alert";
+type Settings = {
+  username: string | null;
+  email?: string;
+  hasMFA: boolean;
+};
 
-const Settings = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<{
-    title: string;
-    message: string;
-    code?: number;
-  } | null>({ title: "Error", message: "An error occurred.", code: 500 });
-  const [loading, setLoading] = useState(true);
+const getData = async (): Promise<{ data?: Settings; error?: Error }> => {
+  const supabase = createClient();
 
-  useEffect(() => {
-    (async () => {
-      const supabase = createClient();
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
+  if (!user) {
+    return {
+      error: {
+        title: "User not found",
+        message: "Please log in to view this page.",
+      },
+    };
+  }
 
-      error
-        ? setError({
-            title: "Could not fetch settings.",
-            message: `${error.message} (code ${error.status})`,
-          })
-        : setUser(user);
-    })();
-    setLoading(false);
-  }, []);
+  // get the user's settings
+  const { data, error } = await supabase
+    .from("Settings")
+    .select("username, has_mfa")
+    .eq("id", user.id)
+    .single();
+
+  if (error) {
+    return {
+      error: {
+        title: "Something went wrong",
+        message: "We could not find your settings.",
+      },
+    };
+  }
+
+  const settings = {
+    username: data.username,
+    email: user.email,
+    hasMFA: data.has_mfa,
+  };
+
+  return { data: settings };
+};
+
+const Settings = async () => {
+  const { data, error } = await getData();
 
   return (
     <Card className="px-4">
@@ -58,13 +74,12 @@ const Settings = () => {
       </CardHeader>
       <CardContent>
         <Separator />
-        {loading && <SkeletonFields />}
-        {user && (
+        {data && (
           <div className="mt-4 flex flex-col gap-6">
-            <UsernameField username={user.user_metadata.username} />
-            <EmaiField email={user.email} />
+            <UsernameField username={data.username} />
+            <EmaiField email={data.email} />
             <PasswordField />
-            <MFAField hasMFA={user.user_metadata.hasMFA} />
+            <MFAField hasMFA={data.hasMFA} />
           </div>
         )}
         {error && <ErrorAlert {...error} />}

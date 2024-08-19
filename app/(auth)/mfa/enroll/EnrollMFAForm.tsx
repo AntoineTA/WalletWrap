@@ -8,18 +8,18 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ErrorAlert, type Error } from "@/components/ui/error-alert";
 import { Button } from "@/components/ui/button";
 
 import { createClient } from "@/utils/supabase/client";
+
+class invalidCodeError extends Error {}
 
 const EnrollMFAForm = () => {
   const [factorId, setFactorId] = useState("");
   const [qr, setQR] = useState(""); //QR code SVG
   const [verificationCode, setVerificationCode] = useState("");
-  const [error, setError] = useState<{ title: string; message: string } | null>(
-    null,
-  );
+  const [error, setError] = useState<Error | null>(null);
   const router = useRouter();
 
   const supabase = createClient();
@@ -27,34 +27,42 @@ const EnrollMFAForm = () => {
   const enrollMFA = async () => {
     setError(null);
 
-    const { error } = await supabase.auth.mfa.challengeAndVerify({
-      factorId,
-      code: verificationCode,
-    });
+    try {
+      // Get current user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not found");
 
-    if (error) {
-      error.status === 422
+      // Challenge and verify the MFA
+      const { error: challengeError } =
+        await supabase.auth.mfa.challengeAndVerify({
+          factorId,
+          code: verificationCode,
+        });
+      if (challengeError && challengeError.status === 422)
+        throw new invalidCodeError(challengeError.message);
+      if (challengeError) throw challengeError;
+
+      // Update the user's MFA status in settings
+      const { error: settingsError } = await supabase
+        .from("Settings")
+        .update({ has_mfa: true })
+        .eq("id", user.id);
+      if (settingsError) throw settingsError;
+
+      // If all went well, redirect to success page
+      router.push("/mfa/enroll/success");
+    } catch (error) {
+      error instanceof invalidCodeError
         ? setError({
-            title: "Invalid verification code.",
-            message: "Please check your 6-digit code and try again.",
+            title: "Invalid code",
+            message: "Please check your 6 digits code and try again.",
           })
         : setError({
-            title: "An error occurred.",
-            message: `${error.message} (code ${error.status})`,
+            title: "An unexpected error occurred.",
+            message: "Please try again.",
           });
-    }
-
-    if (!error) {
-      const user = await supabase.auth.updateUser({
-        data: { hasMFA: true },
-      });
-
-      user.error
-        ? setError({
-            title: "An error occurred.",
-            message: `${user.error.message} (code ${user.error.status})`,
-          })
-        : router.push("/settings");
     }
   };
 
@@ -67,7 +75,8 @@ const EnrollMFAForm = () => {
       if (error) {
         setError({
           title: "An error occurred.",
-          message: `${error.message} (code ${error.status})`,
+          message: error.message,
+          code: error.status,
         });
       }
       if (!error) {
@@ -115,12 +124,7 @@ const EnrollMFAForm = () => {
           </div>
         </div>
       </div>
-      {error && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertTitle>{error.title}</AlertTitle>
-          <AlertDescription>{error.message}</AlertDescription>
-        </Alert>
-      )}
+      {error && <ErrorAlert {...error} />}
     </div>
   );
 };

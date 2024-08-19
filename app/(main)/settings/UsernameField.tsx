@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 
 import { z } from "zod";
@@ -13,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ErrorAlert, Error } from "@/components/ui/error-alert";
 import { useToast } from "@/components/ui/use-toast";
 
 import EditButton from "./EditButton";
@@ -21,7 +23,7 @@ import EditButton from "./EditButton";
 import { createClient } from "@/utils/supabase/client";
 
 interface UsernameFieldProps {
-  username: string | undefined;
+  username: string | null;
 }
 
 const formSchema = z.object({
@@ -38,10 +40,8 @@ const formSchema = z.object({
 const UsernameField: React.FC<UsernameFieldProps> = ({ username }) => {
   const [isEditing, setEditing] = useState(false);
   const [isPending, setPending] = useState(false);
-  const [value, setValue] = useState<string | undefined>(username);
-  const [error, setError] = useState<{ title: string; message: string } | null>(
-    null,
-  );
+  const [value, setValue] = useState(username);
+  const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
 
   const form = useForm({
@@ -67,7 +67,8 @@ const UsernameField: React.FC<UsernameFieldProps> = ({ username }) => {
       console.error(error);
       setError({
         title: "An error occurred.",
-        message: `${error.message} (code ${error.status})`,
+        message: error.message,
+        code: error.status,
       });
     }
     if (!error) {
@@ -121,12 +122,7 @@ const UsernameField: React.FC<UsernameFieldProps> = ({ username }) => {
               isPending={isPending}
             />
           </form>
-          {error && (
-            <Alert variant="destructive" className="mt-4">
-              <AlertTitle>{error.title}</AlertTitle>
-              <AlertDescription>{error.message}</AlertDescription>
-            </Alert>
-          )}
+          {error && <ErrorAlert {...error} />}
         </Form>
       )}
     </div>

@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 
 import { z } from "zod";
@@ -13,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ErrorAlert, Error } from "@/components/ui/error-alert";
 import { useToast } from "@/components/ui/use-toast";
 import EditButton from "./EditButton";
 
@@ -32,9 +34,7 @@ const formSchema = z.object({
 const EmailField: React.FC<EmailFieldProps> = ({ email }) => {
   const [isEditing, setEditing] = useState(false);
   const [isPending, setPending] = useState(false);
-  const [error, setError] = useState<{ title: string; message: string } | null>(
-    null,
-  );
+  const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
 
   const form = useForm({
@@ -65,7 +65,8 @@ const EmailField: React.FC<EmailFieldProps> = ({ email }) => {
           })
         : setError({
             title: "An error occurred.",
-            message: `${error.message} (code ${error.status})`,
+            message: error.message,
+            code: error.status,
           });
     }
     if (!error) {
@@ -118,12 +119,7 @@ const EmailField: React.FC<EmailFieldProps> = ({ email }) => {
               isPending={isPending}
             />
           </form>
-          {error && (
-            <Alert variant="destructive" className="mt-4">
-              <AlertTitle>{error.title}</AlertTitle>
-              <AlertDescription>{error.message}</AlertDescription>
-            </Alert>
-          )}
+          {error && <ErrorAlert {...error} />}
         </Form>
       )}
     </div>
