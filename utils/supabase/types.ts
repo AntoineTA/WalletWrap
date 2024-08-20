@@ -12,7 +12,7 @@ export type Database = {
       Accounts: {
         Row: {
           balance: number;
-          budget: number;
+          budget_id: number;
           created_at: string;
           id: number;
           name: string;
@@ -20,7 +20,7 @@ export type Database = {
         };
         Insert: {
           balance?: number;
-          budget: number;
+          budget_id: number;
           created_at?: string;
           id?: number;
           name: string;
@@ -28,7 +28,7 @@ export type Database = {
         };
         Update: {
           balance?: number;
-          budget?: number;
+          budget_id?: number;
           created_at?: string;
           id?: number;
           name?: string;
@@ -37,7 +37,7 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "Accounts_budget_fkey";
-            columns: ["budget"];
+            columns: ["budget_id"];
             isOneToOne: false;
             referencedRelation: "Budgets";
             referencedColumns: ["id"];
@@ -50,26 +50,26 @@ export type Database = {
           description: string;
           id: number;
           name: string;
-          user: string;
+          user_id: string;
         };
         Insert: {
           created_at?: string;
           description: string;
           id?: number;
           name: string;
-          user: string;
+          user_id: string;
         };
         Update: {
           created_at?: string;
           description?: string;
           id?: number;
           name?: string;
-          user?: string;
+          user_id?: string;
         };
         Relationships: [
           {
             foreignKeyName: "Budgets_user_fkey";
-            columns: ["user"];
+            columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "users";
             referencedColumns: ["id"];
@@ -104,7 +104,7 @@ export type Database = {
       };
       Transactions: {
         Row: {
-          account: number | null;
+          account_id: number | null;
           amount: number;
           created_at: string;
           date: string;
@@ -113,7 +113,7 @@ export type Database = {
           note: string | null;
         };
         Insert: {
-          account?: number | null;
+          account_id?: number | null;
           amount: number;
           created_at?: string;
           date?: string;
@@ -122,7 +122,7 @@ export type Database = {
           note?: string | null;
         };
         Update: {
-          account?: number | null;
+          account_id?: number | null;
           amount?: number;
           created_at?: string;
           date?: string;
@@ -133,7 +133,7 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "Transactions_account_fkey";
-            columns: ["account"];
+            columns: ["account_id"];
             isOneToOne: false;
             referencedRelation: "Accounts";
             referencedColumns: ["id"];

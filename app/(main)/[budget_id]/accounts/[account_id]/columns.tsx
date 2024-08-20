@@ -4,21 +4,25 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
-export type Transaction = {
+export type TableRow = {
   date: string;
-  amount: number;
+  inflow: number | null;
+  outflow: number | null;
   note: string | null;
-  isInflow: boolean;
 };
 
-export const columns: ColumnDef<Transaction>[] = [
+export const columns: ColumnDef<TableRow>[] = [
   {
     header: "Date",
     accessorKey: "date",
   },
   {
-    header: "Amount",
-    accessorKey: "amount",
+    header: "Inflow",
+    accessorKey: "inflow",
+  },
+  {
+    header: "Outflow",
+    accessorKey: "outflow",
   },
   {
     header: "Note",

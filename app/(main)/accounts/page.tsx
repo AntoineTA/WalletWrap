@@ -1,23 +1,30 @@
+import { ErrorAlert, type Error } from "@/components/ui/error-alert";
+
 import { createClient } from "@/utils/supabase/server";
+
 import { columns, Transaction } from "./columns";
 import { DataTable } from "./DataTable";
 
-const getData = async (): Promise<Transaction[]> => {
+const getData = async (): Promise<{ data?: Transaction[]; error?: Error }> => {
   const supabase = createClient();
-  const { data, error } = await supabase.from("Transactions").select();
 
-  if (error) {
-    throw error;
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      error: {
+        title: "User not found",
+        message: "Please log in to view this page.",
+      },
+    };
   }
 
-  const transactions = data.map((row) => ({
-    date: row.date,
-    amount: row.amount,
-    note: row.note,
-    isInflow: row.is_inflow,
-  }));
+  // get the user's transactions
 
-  return transactions;
+  return { data: undefined, error: undefined };
 };
 
 const Accounts = async () => {
@@ -25,7 +32,7 @@ const Accounts = async () => {
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={transactions} />
+      {/* <DataTable columns={columns} data={data} /> */}
     </div>
   );
 };

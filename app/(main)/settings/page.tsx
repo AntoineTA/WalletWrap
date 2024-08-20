@@ -21,7 +21,10 @@ type Settings = {
   hasMFA: boolean;
 };
 
-const getData = async (): Promise<{ data?: Settings; error?: Error }> => {
+const getSettings = async (): Promise<{
+  settings?: Settings;
+  error?: Error;
+}> => {
   const supabase = createClient();
 
   // Get the current user
@@ -54,17 +57,17 @@ const getData = async (): Promise<{ data?: Settings; error?: Error }> => {
     };
   }
 
-  const settings = {
-    username: data.username,
-    email: user.email,
-    hasMFA: data.has_mfa,
+  return {
+    settings: {
+      username: data.username,
+      email: user.email,
+      hasMFA: data.has_mfa,
+    },
   };
-
-  return { data: settings };
 };
 
 const Settings = async () => {
-  const { data, error } = await getData();
+  const { settings, error } = await getSettings();
 
   return (
     <Card className="px-4">
@@ -74,12 +77,12 @@ const Settings = async () => {
       </CardHeader>
       <CardContent>
         <Separator />
-        {data && (
+        {settings && (
           <div className="mt-4 flex flex-col gap-6">
-            <UsernameField username={data.username} />
-            <EmaiField email={data.email} />
+            <UsernameField username={settings.username} />
+            <EmaiField email={settings.email} />
             <PasswordField />
-            <MFAField hasMFA={data.hasMFA} />
+            <MFAField hasMFA={settings.hasMFA} />
           </div>
         )}
         {error && <ErrorAlert {...error} />}
