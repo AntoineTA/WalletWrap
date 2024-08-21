@@ -11,6 +11,7 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
+  type RowData,
 } from "@tanstack/react-table";
 
 import {
@@ -32,15 +33,29 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Filter } from "lucide-react";
 
+declare module "@tanstack/react-table" {
+  interface TableMeta<TData extends RowData> {
+    editedRows: EditedRows;
+    setEditedRows: (editedRows: EditedRows) => void;
+    revertData: (rowIndex: number, revert: boolean) => void;
+    updateData: (rowIndex: number, columnId: string, value: string) => void;
+  }
+}
+
+type EditedRows = { [key: string]: boolean };
+
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 };
 
-export function DataTable<TData, TValue>({
+export function TransactionTable<TData, TValue>({
   columns,
-  data,
+  data: _data,
 }: DataTableProps<TData, TValue>) {
+  const [data, setData] = useState(_data); // initialize the table with the data passed in the prop
+  const [editedRows, setEditedRows] = useState<EditedRows>({}); // indicates which rows are in edit mode
+  const [originalData, setOriginalData] = useState(_data); // store the data from before an edit
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
@@ -52,13 +67,45 @@ export function DataTable<TData, TValue>({
     state: {
       columnFilters,
     },
+    meta: {
+      editedRows,
+      setEditedRows,
+      revertData: (rowIndex, revert) => {
+        if (revert) {
+          setData((old) =>
+            old.map((row, index) =>
+              index === rowIndex ? originalData[rowIndex] : row,
+            ),
+          );
+        } else {
+          setOriginalData((old) =>
+            old.map((row, index) =>
+              index === rowIndex ? data[rowIndex] : row,
+            ),
+          );
+        }
+      },
+      updateData: (rowIndex, columnId, value) => {
+        setData((old) =>
+          old.map((row, index) => {
+            if (index === rowIndex) {
+              return {
+                ...old[rowIndex],
+                [columnId]: value,
+              };
+            }
+            return row;
+          }),
+        );
+      },
+    },
   });
 
   const filters = table
     .getAllColumns()
     .map((column) => {
       const filter = column.columnDef.meta?.filter;
-      if (filter?.enable) {
+      if (filter?.enabled) {
         return {
           name: filter.name,
           columnID: column.id,
@@ -184,6 +231,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      {/* <pre className="text-xs">{JSON.stringify(data, null, "\t")}</pre> */}
     </div>
   );
 }

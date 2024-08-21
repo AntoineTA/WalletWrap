@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/ui/data-table";
+import { TransactionTable } from "./TransactionTable";
 import { columnsWithAccount, type Transaction } from "./columns";
 import { ErrorAlert, type Error } from "@/components/ui/error-alert";
 
@@ -42,7 +42,7 @@ const AllAccounts = async ({ params }: { params: { budget_id: number } }) => {
 
   return (
     <div className="container mx-auto py-10">
-      {data && <DataTable columns={columnsWithAccount} data={data} />}
+      {data && <TransactionTable columns={columnsWithAccount} data={data} />}
       {error && <ErrorAlert {...error} />}
     </div>
   );
