@@ -4,9 +4,9 @@
 
 import type { ColumnDef, RowData } from "@tanstack/react-table";
 
-export type TableRow = {
+export type Transaction = {
   date: string;
-  account: string;
+  account?: string;
   outflow: number | null;
   inflow: number | null;
   note: string | null;
@@ -25,7 +25,7 @@ const formatAmount = (amount: number | null): string => {
   return amount ? amount.toFixed(2) : "";
 };
 
-export const columns: ColumnDef<TableRow>[] = [
+export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "date",
     header: "Date",
@@ -36,22 +36,12 @@ export const columns: ColumnDef<TableRow>[] = [
     },
   },
   {
-    accessorKey: "account",
-    header: "Account",
-    meta: {
-      filter: {
-        enable: true,
-        name: "Account",
-      },
-    },
-  },
-  {
     accessorKey: "note",
     header: "Note",
     meta: {
       filter: {
         enable: true,
-        name: "Note",
+        name: "Notes",
       },
     },
   },
@@ -80,3 +70,14 @@ export const columns: ColumnDef<TableRow>[] = [
     },
   },
 ];
+
+export const columnsWithAccount = columns.toSpliced(1, 0, {
+  accessorKey: "account",
+  header: "Account",
+  meta: {
+    filter: {
+      enable: true,
+      name: "Accounts",
+    },
+  },
+});

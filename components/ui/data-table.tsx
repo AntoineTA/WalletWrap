@@ -86,39 +86,49 @@ export function DataTable<TData, TValue>({
                   .getColumn(currentFilter.columnID)
                   ?.setFilterValue(event.target.value)
               }
+              placeholder={
+                filters.length == 1
+                  ? `Filter ${currentFilter.name.toLowerCase()}`
+                  : ""
+              }
               className="w-80"
             />
-            <div className="absolute right-0 top-0">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost">
-                    <span className="mr-2 opacity-60">
-                      {currentFilter.name}
-                    </span>
-                    <Filter className="h-4 w-4 opacity-50" aria-hidden="true" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>Search in column</DropdownMenuLabel>
-                  {filters.map((filter) => {
-                    return (
-                      <DropdownMenuItem
-                        key={filter.columnID}
-                        onClick={() => {
-                          console.log(filter);
-                          table
-                            .getColumn(currentFilter.columnID)
-                            ?.setFilterValue(""); //clear the current filter
-                          setCurrentFilter(filter);
-                        }}
-                      >
-                        {filter.name}
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            {filters.length > 1 && (
+              <div className="absolute right-0 top-0">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost">
+                      <span className="mr-2 opacity-60">
+                        {currentFilter.name}
+                      </span>
+                      <Filter
+                        className="h-4 w-4 opacity-50"
+                        aria-hidden="true"
+                      />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+                    {filters.map((filter) => {
+                      return (
+                        <DropdownMenuItem
+                          key={filter.columnID}
+                          onClick={() => {
+                            console.log(filter);
+                            table
+                              .getColumn(currentFilter.columnID)
+                              ?.setFilterValue(""); //clear the current filter
+                            setCurrentFilter(filter);
+                          }}
+                        >
+                          {filter.name}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
           </div>
         )}
       </div>

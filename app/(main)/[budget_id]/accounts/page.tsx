@@ -1,12 +1,12 @@
 import { DataTable } from "@/components/ui/data-table";
-import { columns, type TableRow } from "./columns";
+import { columnsWithAccount, type Transaction } from "./columns";
 import { ErrorAlert, type Error } from "@/components/ui/error-alert";
 
 import { createClient } from "@/utils/supabase/server";
 
 const getData = async (
   budget_id: number,
-): Promise<{ data?: TableRow[]; error?: Error }> => {
+): Promise<{ data?: Transaction[]; error?: Error }> => {
   const supabase = createClient();
 
   // fetch all transactions for all accounts in the given budget
@@ -42,7 +42,7 @@ const AllAccounts = async ({ params }: { params: { budget_id: number } }) => {
 
   return (
     <div className="container mx-auto py-10">
-      {data && <DataTable columns={columns} data={data} />}
+      {data && <DataTable columns={columnsWithAccount} data={data} />}
       {error && <ErrorAlert {...error} />}
     </div>
   );

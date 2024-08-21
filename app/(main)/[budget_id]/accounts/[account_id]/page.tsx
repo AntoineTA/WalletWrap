@@ -1,12 +1,12 @@
 import { DataTable } from "@/components/ui/data-table";
-import { columns, type TableRow } from "./columns";
+import { columns, type Transaction } from "../columns";
 import { ErrorAlert, type Error } from "@/components/ui/error-alert";
 
 import { createClient } from "@/utils/supabase/server";
 
 const getData = async (
   account_id: number,
-): Promise<{ data?: TableRow[]; error?: Error }> => {
+): Promise<{ data?: Transaction[]; error?: Error }> => {
   const supabase = createClient();
 
   // fetch all transactions for the given account
