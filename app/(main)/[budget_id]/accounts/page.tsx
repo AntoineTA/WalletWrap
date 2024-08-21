@@ -27,7 +27,7 @@ const getData = async (
   const data = rawData.flatMap((account) => {
     return account.Transactions.map((transaction) => ({
       date: transaction.date,
-      accountName: account.name,
+      account: account.name,
       outflow: transaction.is_inflow ? null : transaction.amount,
       inflow: transaction.is_inflow ? transaction.amount : null,
       note: transaction.note,
