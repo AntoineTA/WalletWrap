@@ -42,7 +42,12 @@ const AllAccounts = async ({ params }: { params: { budget_id: number } }) => {
 
   return (
     <div className="container mx-auto py-10">
-      {data && <TransactionTable columns={columnsWithAccount} data={data} />}
+      {data && (
+        <TransactionTable<Transaction>
+          columns={columnsWithAccount}
+          data={data}
+        />
+      )}
       {error && <ErrorAlert {...error} />}
     </div>
   );

@@ -13,10 +13,6 @@ const TableCell = ({ getValue, row, column, table }: any) => {
     setValue(initialValue);
   }, [initialValue]);
 
-  const onBlur = () => {
-    table.options.meta?.updateData(row.index, column.id, value);
-  };
-
   // If the row is being edited, return the input field
   if (tableMeta?.editedRows[row.id]) {
     return (
@@ -24,7 +20,7 @@ const TableCell = ({ getValue, row, column, table }: any) => {
         className="w-full"
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        onBlur={onBlur}
+        onBlur={() => tableMeta.updateCell(row.index, column.id, value)}
         type={columnMeta?.type || "text"}
       />
     );
