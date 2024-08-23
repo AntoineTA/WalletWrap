@@ -9,7 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      Accounts: {
+      accounts: {
         Row: {
           balance: number;
           budget_id: number;
@@ -39,12 +39,12 @@ export type Database = {
             foreignKeyName: "Accounts_budget_fkey";
             columns: ["budget_id"];
             isOneToOne: false;
-            referencedRelation: "Budgets";
+            referencedRelation: "budgets";
             referencedColumns: ["id"];
           },
         ];
       };
-      Budgets: {
+      budgets: {
         Row: {
           created_at: string;
           description: string;
@@ -76,7 +76,7 @@ export type Database = {
           },
         ];
       };
-      Settings: {
+      settings: {
         Row: {
           has_mfa: boolean;
           id: string;
@@ -102,40 +102,37 @@ export type Database = {
           },
         ];
       };
-      Transactions: {
+      transactions: {
         Row: {
-          account_id: number | null;
-          amount: number;
-          created_at: string;
+          account_id: number;
           date: string;
           id: number;
-          is_inflow: boolean;
+          inflow: number | null;
           note: string | null;
+          outflow: number | null;
         };
         Insert: {
-          account_id?: number | null;
-          amount: number;
-          created_at?: string;
+          account_id: number;
           date?: string;
           id?: number;
-          is_inflow?: boolean;
+          inflow?: number | null;
           note?: string | null;
+          outflow?: number | null;
         };
         Update: {
-          account_id?: number | null;
-          amount?: number;
-          created_at?: string;
+          account_id?: number;
           date?: string;
           id?: number;
-          is_inflow?: boolean;
+          inflow?: number | null;
           note?: string | null;
+          outflow?: number | null;
         };
         Relationships: [
           {
             foreignKeyName: "Transactions_account_fkey";
             columns: ["account_id"];
             isOneToOne: false;
-            referencedRelation: "Accounts";
+            referencedRelation: "accounts";
             referencedColumns: ["id"];
           },
         ];

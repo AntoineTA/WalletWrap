@@ -1,54 +1,54 @@
-import { TransactionTable } from "./TransactionTable";
-import { columnsWithAccount, type Transaction } from "./columns";
 import { ErrorAlert, type Error } from "@/components/ui/error-alert";
+import { columns } from "./columns";
+import {
+  getAccounts,
+  getTransactions,
+  upsertTransaction,
+  deleteTransactions,
+} from "./actions";
+import { DataTable } from "@/components/DataTable/DataTable";
 
-import { createClient } from "@/utils/supabase/server";
-
-const getData = async (
-  budget_id: number,
-): Promise<{ data?: Transaction[]; error?: Error }> => {
-  const supabase = createClient();
-
-  // fetch all transactions for all accounts in the given budget
-  const { data: rawData, error } = await supabase
-    .from("Accounts")
-    .select("name, Transactions (date, amount, is_inflow, note)")
-    .eq("budget_id", budget_id);
-
-  if (error) {
-    return {
-      error: {
-        title: "Something went wrong",
-        message: error.message,
-      },
-    };
-  }
-
-  const data = rawData.flatMap((account) => {
-    return account.Transactions.map((transaction) => ({
-      date: transaction.date,
-      account: account.name,
-      outflow: transaction.is_inflow ? null : transaction.amount,
-      inflow: transaction.is_inflow ? transaction.amount : null,
-      note: transaction.note,
-    }));
-  });
-
-  return { data };
+export type Transaction = {
+  id: number;
+  account_id: number;
+  date: string;
+  outflow: number | null;
+  inflow: number | null;
+  note: string | null;
 };
 
 const AllAccounts = async ({ params }: { params: { budget_id: number } }) => {
-  const { data, error } = await getData(params.budget_id);
+  const { transactions, error: transactionError } = await getTransactions(
+    params.budget_id,
+  );
+  const { accounts, error: accountError } = await getAccounts(params.budget_id);
+
+  if (transactionError || accountError) {
+    return (
+      <ErrorAlert
+        title="Something went wrong"
+        message="We could not load your data."
+      />
+    );
+  }
+
+  const metadata = {
+    accounts: accounts.map((account) => ({
+      id: account.id,
+      name: account.name,
+    })),
+  };
 
   return (
     <div className="container mx-auto py-10">
-      {data && (
-        <TransactionTable<Transaction>
-          columns={columnsWithAccount}
-          data={data}
-        />
-      )}
-      {error && <ErrorAlert {...error} />}
+      <DataTable<Transaction>
+        columns={columns}
+        data={transactions}
+        metadata={metadata}
+        onRowSave={upsertTransaction}
+        onRowDelete={deleteTransactions}
+        emptyDataMessage="No transactions found"
+      />
     </div>
   );
 };

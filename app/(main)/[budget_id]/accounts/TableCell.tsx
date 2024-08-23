@@ -15,7 +15,21 @@ const TableCell = ({ getValue, row, column, table }: any) => {
 
   // If the row is being edited, return the input field
   if (tableMeta?.editedRows[row.id]) {
-    return (
+    return columnMeta.type === "select" ? (
+      <select
+        value={initialValue}
+        onChange={(event) => {
+          setValue(event.target.value);
+          tableMeta.updateCell(row.index, column.id, event.target.value);
+        }}
+      >
+        {columnMeta.options?.map((option: { value: string; label: string }) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    ) : (
       <Input
         className="w-full"
         value={value}

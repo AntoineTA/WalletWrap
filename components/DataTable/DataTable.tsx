@@ -32,20 +32,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Filter } from "lucide-react";
-import AddRowButton from "./AddRowButton";
-import { RemoveRowsButton } from "./RemoveRowsButton";
-import { createClient } from "@/utils/supabase/client";
+import { AddRowButton, RemoveRowsButton } from "./ControlButtons";
 
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
+    metadata: Record<string, any[]>;
     editedRows: EditedRows;
     setEditedRows: (editedRows: EditedRows) => void;
-    updateCell: (rowIndex: number, columnId: string, value: string) => void;
+    updateCell: <K extends keyof TData>(
+      rowIndex: number,
+      columnId: K,
+      value: TData[K],
+    ) => void;
     saveRow: (rowIndex: number) => void;
     revertRow: (rowIndex: number) => void;
     addRow: () => void;
     removeRow: (rowIndex: number) => void;
-    removeSelectedRows: (selectedRows: number[]) => void;
+    removeRows: (rowsIndices: number[]) => void;
   }
 }
 
@@ -54,15 +57,23 @@ type EditedRows = { [key: string]: boolean };
 type DataTableProps<TData> = {
   columns: ColumnDef<TData>[];
   data: TData[];
+  metadata: Record<string, any[]>;
+  onRowSave: (data: TData) => void;
+  onRowDelete: (data: TData[]) => void;
+  emptyDataMessage: string;
 };
 
-export function TransactionTable<TData>({
+export function DataTable<TData>({
   columns,
   data: _data,
+  metadata,
+  onRowSave,
+  onRowDelete,
+  emptyDataMessage = "No data to display",
 }: DataTableProps<TData>) {
   const [data, setData] = useState(_data); // store the data currently contained by the table
-  const [editedRows, setEditedRows] = useState<EditedRows>({}); // indicates which rows are in edit mode
   const [savedData, setSavedData] = useState(_data); // store the data from before an edit
+  const [editedRows, setEditedRows] = useState<EditedRows>({}); // indicates which rows are in edit mode
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
@@ -76,6 +87,7 @@ export function TransactionTable<TData>({
       columnFilters,
     },
     meta: {
+      metadata,
       editedRows,
       setEditedRows,
       updateCell: (rowIndex, columnId, value) => {
@@ -91,12 +103,12 @@ export function TransactionTable<TData>({
           }),
         );
       },
-      saveRow: (rowIndex) => {
+      saveRow: async (rowIndex) => {
         const setFunc = (old: TData[]) =>
           old.map((row, index) => (index === rowIndex ? data[rowIndex] : row));
         setData(setFunc);
         setSavedData(setFunc);
-        // TODO: dispatch the row to supabase
+        onRowSave(data[rowIndex]);
       },
       revertRow: (rowIndex) => {
         setData(
@@ -105,7 +117,7 @@ export function TransactionTable<TData>({
               .map((row, index) =>
                 index === rowIndex ? savedData[rowIndex] : row,
               )
-              .filter((row) => row !== undefined), // remove the undefined values (in case the creation of a row was cancelled)
+              .filter((row) => row !== undefined), // remove the undefined values, in case the creation of a row was cancelled.
         );
       },
       addRow: () => {
@@ -117,19 +129,19 @@ export function TransactionTable<TData>({
           return [...old, {} as TData];
         });
       },
-      removeRow: (rowIndex: number) => {
+      removeRow: (rowIndex) => {
         const setFilterFunc = (old: TData[]) =>
           old.filter((_row: TData, index: number) => index !== rowIndex); // remove the row by applying a filter
         setData(setFilterFunc);
         setSavedData(setFilterFunc);
-        //TODO: remove row from database
+        onRowDelete([data[rowIndex]]);
       },
-      removeSelectedRows: (selectedRows: number[]) => {
+      removeRows: (rowsIndices) => {
         const setFilterFunc = (old: TData[]) =>
-          old.filter((_row, index) => !selectedRows.includes(index));
+          old.filter((_row, index) => !rowsIndices.includes(index));
         setData(setFilterFunc);
         setSavedData(setFilterFunc);
-        //TODO: remove selected rows from database
+        onRowDelete(rowsIndices.map((index) => data[index]));
       },
     },
   });
@@ -261,7 +273,7 @@ export function TransactionTable<TData>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No transactions found
+                  {emptyDataMessage}
                 </TableCell>
               </TableRow>
             )}
