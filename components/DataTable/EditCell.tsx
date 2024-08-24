@@ -1,23 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { Minus, Check, Pencil, Trash2 } from "lucide-react";
+import type { Table, Row } from "@tanstack/react-table";
 
-const EditCell = ({ row, table }: any) => {
-  const meta = table.options.meta;
+type EditCellProps<TData> = {
+  row: Row<TData>;
+  table: Table<TData>;
+};
+
+const EditCell = <TData,>({ row, table }: EditCellProps<TData>) => {
+  const meta = table.options.meta!;
 
   const changeEditStatus = () => {
-    meta.setEditedRows((old: []) => ({
+    meta.setEditedRows((old: any) => ({
       ...old,
-      [row.id]: !old[row.id],
+      [row.index]: !old[row.index],
     }));
   };
 
   // "Cancel" and "Save" actions only shows for rows whose id is map to true in editedRows
   return (
     <div>
-      {meta.editedRows[row.id] ? (
+      {meta.editedRows[row.index] ? (
         <div>
           <Button
             onClick={() => {
+              console.log("revertRow", row.index);
               meta.revertRow(row.index);
               changeEditStatus();
             }}
@@ -50,7 +57,7 @@ const EditCell = ({ row, table }: any) => {
             <Pencil className="h-4 w-4" />
           </Button>
           <Button
-            onClick={() => meta?.removeRow(row.index)}
+            onClick={() => meta.removeRow(row.index)}
             variant="ghost"
             size="icon"
             name="remove"

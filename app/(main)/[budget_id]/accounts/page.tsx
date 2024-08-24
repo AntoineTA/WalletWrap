@@ -35,7 +35,7 @@ const AllAccounts = async ({ params }: { params: { budget_id: number } }) => {
   const metadata = {
     accounts: accounts.map((account) => ({
       id: account.id,
-      name: account.name,
+      label: account.name,
     })),
   };
 

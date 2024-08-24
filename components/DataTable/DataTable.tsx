@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   ColumnDef,
@@ -37,22 +37,18 @@ import { AddRowButton, RemoveRowsButton } from "./ControlButtons";
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
     metadata: Record<string, any[]>;
-    editedRows: EditedRows;
-    setEditedRows: (editedRows: EditedRows) => void;
-    updateCell: <K extends keyof TData>(
-      rowIndex: number,
-      columnId: K,
-      value: TData[K],
-    ) => void;
+    editedRows: any;
+    setEditedRows: (editedRows: any) => void;
+    updateCell: (rowIndex: number, columnId: string, value: any) => void;
     saveRow: (rowIndex: number) => void;
     revertRow: (rowIndex: number) => void;
     addRow: () => void;
     removeRow: (rowIndex: number) => void;
-    removeRows: (rowsIndices: number[]) => void;
+    removeRows: (rowIndices: number[]) => void;
   }
 }
 
-type EditedRows = { [key: string]: boolean };
+// type EditedRows = { [key: number]: boolean };
 
 type DataTableProps<TData> = {
   columns: ColumnDef<TData>[];
@@ -73,7 +69,7 @@ export function DataTable<TData>({
 }: DataTableProps<TData>) {
   const [data, setData] = useState(_data); // store the data currently contained by the table
   const [savedData, setSavedData] = useState(_data); // store the data from before an edit
-  const [editedRows, setEditedRows] = useState<EditedRows>({}); // indicates which rows are in edit mode
+  const [editedRows, setEditedRows] = useState({}); // indicates which rows are in edit mode
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
@@ -103,11 +99,8 @@ export function DataTable<TData>({
           }),
         );
       },
-      saveRow: async (rowIndex) => {
-        const setFunc = (old: TData[]) =>
-          old.map((row, index) => (index === rowIndex ? data[rowIndex] : row));
-        setData(setFunc);
-        setSavedData(setFunc);
+      saveRow: (rowIndex) => {
+        setSavedData(data);
         onRowSave(data[rowIndex]);
       },
       revertRow: (rowIndex) => {
@@ -122,25 +115,25 @@ export function DataTable<TData>({
       },
       addRow: () => {
         setData((old) => {
-          setEditedRows({
-            ...editedRows, // keep the current editing state
-            [data.length]: true, // set the new row to be in edit mode
-          });
           return [...old, {} as TData];
+        });
+        setEditedRows({
+          ...editedRows, // keep the current editing state
+          [data.length]: true, // set the new row to be in edit mode
         });
       },
       removeRow: (rowIndex) => {
-        const setFilterFunc = (old: TData[]) =>
-          old.filter((_row: TData, index: number) => index !== rowIndex); // remove the row by applying a filter
-        setData(setFilterFunc);
-        setSavedData(setFilterFunc);
+        const updated = data.filter((_row, index) => index !== rowIndex);
+        setData(updated);
+        setSavedData(updated);
         onRowDelete([data[rowIndex]]);
       },
       removeRows: (rowsIndices) => {
-        const setFilterFunc = (old: TData[]) =>
-          old.filter((_row, index) => !rowsIndices.includes(index));
-        setData(setFilterFunc);
-        setSavedData(setFilterFunc);
+        const updated = data.filter(
+          (_row, index) => !rowsIndices.includes(index),
+        );
+        setData(updated);
+        setSavedData(updated);
         onRowDelete(rowsIndices.map((index) => data[index]));
       },
     },
@@ -237,7 +230,7 @@ export function DataTable<TData>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="capitalize">
                       {header.isPlaceholder
                         ? null
                         : flexRender(

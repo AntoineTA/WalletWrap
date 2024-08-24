@@ -1,9 +1,9 @@
 "use client";
 
 import { type ColumnDef, type RowData } from "@tanstack/react-table";
-import { TableCell } from "./TableCell";
-import { EditCell } from "./EditCell";
-import { AccountCell } from "./AccountCell";
+import { TableCell } from "@/components/DataTable/TableCell";
+import { EditCell } from "@/components/DataTable/EditCell";
+import { AccountCell, DateCell } from "./Cells";
 import type { Transaction } from "./page";
 
 declare module "@tanstack/react-table" {
@@ -19,15 +19,14 @@ declare module "@tanstack/react-table" {
 export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "date",
-    header: "Date",
-    cell: TableCell,
+    cell: DateCell,
     meta: {
       type: "date",
     },
   },
   {
     accessorKey: "account_id",
-    header: "Account",
+    header: "account",
     cell: AccountCell,
     meta: {
       filter: {
@@ -39,7 +38,6 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "note",
-    header: "Note",
     cell: TableCell,
     meta: {
       filter: {
@@ -51,7 +49,7 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "outflow",
     header: () => {
-      return <div className="text-right">Outflow</div>;
+      return <div className="text-right">outflow</div>;
     },
     cell: TableCell,
     meta: {
@@ -61,7 +59,7 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "inflow",
     header: () => {
-      return <div className="text-right">Inflow</div>;
+      return <div className="text-right">inflow</div>;
     },
     cell: TableCell,
     meta: {
@@ -73,17 +71,3 @@ export const columns: ColumnDef<Transaction>[] = [
     cell: EditCell,
   },
 ];
-
-// export const columnsWithAccount = columns.toSpliced(1, 0, {
-//   accessorKey: "account_name",
-//   header: "Account",
-//   cell: AccountCell,
-//   meta: {
-//     filter: {
-//       enabled: true,
-//       name: "Accounts",
-//     },
-//     type: "select",
-
-//   },
-// });
