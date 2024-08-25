@@ -34,7 +34,6 @@ function ChallengeMFA() {
           factorId: factors.data.totp[0].id,
           code: value,
         });
-        console.log(challenge);
 
         if (challenge.error) {
           challenge.error.status === 422

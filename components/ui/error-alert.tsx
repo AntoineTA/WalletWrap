@@ -3,7 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 export type Error = {
   title: string;
   message: string;
-  code?: number;
+  code?: number | string;
 };
 
 export const ErrorAlert = (error: Error) => {

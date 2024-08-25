@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { Transaction } from "./page";
+import { Transaction } from "./TransactionTable";
 
 export const getTransactions = async (budget_id: number) => {
   const supabase = createClient();
@@ -36,18 +36,38 @@ export const getTransactions = async (budget_id: number) => {
 
 export const upsertTransaction = async (data: Transaction) => {
   const supabase = createClient();
-  const { data: res, error } = await supabase
+
+  const { error } = await supabase
     .from("transactions")
-    .upsert(data, { ignoreDuplicates: false });
+    .upsert(data, { onConflict: "id", ignoreDuplicates: false });
+
+  if (error)
+    return {
+      error: {
+        title: "Could not save transaction",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { error: null };
 };
 
-export const deleteTransactions = async (data: Transaction[]) => {
+export const deleteTransactions = async (ids: number[]) => {
   const supabase = createClient();
 
-  const ids = data.map((d) => d.id);
   const { error } = await supabase.from("transactions").delete().in("id", ids);
 
-  console.log("error", error);
+  if (error)
+    return {
+      error: {
+        title: "Could not delete transactions",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { error: null };
 };
 
 export const getAccounts = async (budget_id: number) => {

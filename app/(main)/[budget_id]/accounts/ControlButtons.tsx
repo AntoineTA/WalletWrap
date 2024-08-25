@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import type { Table } from "@tanstack/react-table";
+import type { Transaction } from "./TransactionTable";
 
-type ControlButtonsProps<TData> = {
-  table: Table<TData>;
+type ControlButtonsProps = {
+  table: Table<Transaction>;
 };
 
-export const AddRowButton = <TData,>({ table }: ControlButtonsProps<TData>) => {
+export const AddRowButton = ({ table }: ControlButtonsProps) => {
   const meta = table.options.meta!;
 
   return (
@@ -15,9 +16,7 @@ export const AddRowButton = <TData,>({ table }: ControlButtonsProps<TData>) => {
   );
 };
 
-export const RemoveRowsButton = <TData,>({
-  table,
-}: ControlButtonsProps<TData>) => {
+export const RemoveRowsButton = ({ table }: ControlButtonsProps) => {
   const meta = table.options.meta!;
 
   const removeRows = () => {

@@ -1,10 +1,10 @@
 "use client";
 
 import { type ColumnDef, type RowData } from "@tanstack/react-table";
-import { TableCell } from "@/components/DataTable/TableCell";
-import { EditCell } from "@/components/DataTable/EditCell";
-import { AccountCell, DateCell } from "./Cells";
-import type { Transaction } from "./page";
+import { EditCell } from "./EditCell";
+import { TableCell, DateCell, AmountCell } from "./InputCells";
+import { AccountCell } from "./SelectCells";
+import type { Transaction } from "./TransactionTable";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -48,20 +48,14 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "outflow",
-    header: () => {
-      return <div className="text-right">outflow</div>;
-    },
-    cell: TableCell,
+    cell: AmountCell,
     meta: {
       type: "number",
     },
   },
   {
     accessorKey: "inflow",
-    header: () => {
-      return <div className="text-right">inflow</div>;
-    },
-    cell: TableCell,
+    cell: AmountCell,
     meta: {
       type: "number",
     },
