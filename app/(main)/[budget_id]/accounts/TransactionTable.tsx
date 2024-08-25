@@ -8,6 +8,8 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
   useReactTable,
   type RowData,
 } from "@tanstack/react-table";
@@ -44,8 +46,8 @@ type SelectOptions = {
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
     selectOptions: SelectOptions;
-    editedRows: any;
-    setEditedRows: (editedRows: any) => void;
+    editingIndex: number | null;
+    setEditingIndex: (index: number | null) => void;
     updateCell: (rowIndex: number, columnId: string, value: any) => void;
     saveRow: (rowIndex: number) => void;
     revertRow: (rowIndex: number) => void;
@@ -70,8 +72,8 @@ export function TransactionTable({
   const [selectOptions, setSelectOptions] = useState<SelectOptions>({
     accounts: [],
   });
-  const [editedRows, setEditedRows] = useState({}); // indicates which rows are in edit mode
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  // const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [isPending, setIsPending] = useState(true);
 
@@ -122,7 +124,8 @@ export function TransactionTable({
         });
         return;
       }
-      setSavedData(transactions);
+      // setSavedData(transactions);
+      setData(transactions);
     })();
   }, [toggleSync]);
 
@@ -130,15 +133,15 @@ export function TransactionTable({
     columns,
     data,
     getCoreRowModel: getCoreRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
+    // onColumnFiltersChange: setColumnFilters,
+    // getFilteredRowModel: getFilteredRowModel(),
     enableRowSelection: true,
     state: {
-      columnFilters,
+      // columnFilters,
     },
     meta: {
-      editedRows,
-      setEditedRows,
+      editingIndex,
+      setEditingIndex,
       selectOptions,
       updateCell: (rowIndex, columnId, value) => {
         setData((old) =>
@@ -154,14 +157,18 @@ export function TransactionTable({
         );
       },
       saveRow: async (rowIndex) => {
-        setData(data);
-        //TODO: prevent the row from being edited until the data is saved
+        const updated = [...data].sort(
+          (a, b) => new Date(b.date).getDate() - new Date(a.date).getDate(),
+        ); // sort by date descending
+        setData(updated);
+        // setSavedData(updated);
+
         const { error } = await upsertTransaction(data[rowIndex]);
         if (error) {
           setError(error);
           return;
         }
-        setToggleSync(!toggleSync);
+        // setToggleSync(!toggleSync);
       },
       revertRow: (rowIndex) => {
         setData((old) =>
@@ -174,12 +181,9 @@ export function TransactionTable({
       },
       addRow: () => {
         setData((old) => {
-          return [...old, {} as Transaction];
+          return [{} as Transaction, ...old];
         });
-        setEditedRows({
-          ...editedRows, // keep the current editing state
-          [data.length]: true, // set the new row to be in edit mode
-        });
+        setEditingIndex(0); //set the new row in edit mode
       },
       removeRow: async (rowIndex) => {
         const updated = data.filter((_row, index) => index !== rowIndex);
@@ -259,7 +263,11 @@ export function TransactionTable({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-0 h-12 w-64">
+                    <TableCell
+                      key={cell.id}
+                      className="py-0 h-12"
+                      style={{ width: cell.column.getSize() }}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),

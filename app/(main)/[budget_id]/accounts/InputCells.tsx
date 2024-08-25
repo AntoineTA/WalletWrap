@@ -54,7 +54,7 @@ export const TableCell = ({
   }, [initialValue]);
 
   // If the row is being edited, return the input field
-  if (tableMeta.editedRows[row.index]) {
+  if (tableMeta.editingIndex === row.index) {
     return (
       <Input
         className="h-8 p-0"

@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Check, Minus, MoreHorizontal, Pencil } from "lucide-react";
-import type { Table, Row } from "@tanstack/react-table";
-import { Transaction } from "./TransactionTable";
+import { Check, Minus, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { Table, Row } from "@tanstack/react-table";
+import type { Transaction } from "./TransactionTable";
 
 type EditCellProps = {
   row: Row<Transaction>;
@@ -17,16 +17,9 @@ type EditCellProps = {
 const EditCell = ({ row, table }: EditCellProps) => {
   const meta = table.options.meta!;
 
-  const changeEditStatus = () => {
-    meta.setEditedRows((old: any) => ({
-      ...old,
-      [row.index]: !old[row.index],
-    }));
-  };
-
   return (
-    <div>
-      {!meta.editedRows[row.index] && (
+    <div className="flex justify-center">
+      {meta.editingIndex !== row.index && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-4 w-4 p-0">
@@ -35,34 +28,50 @@ const EditCell = ({ row, table }: EditCellProps) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={changeEditStatus}>Edit</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => meta.removeRow(row.index)}>
+            <DropdownMenuItem
+              onClick={() => {
+                if (meta.editingIndex !== null)
+                  // If there is a row being edited, revert it
+                  meta.revertRow(meta.editingIndex);
+                meta.setEditingIndex(row.index);
+              }}
+            >
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                if (meta.editingIndex !== null)
+                  meta.revertRow(meta.editingIndex);
+                meta.removeRow(row.index);
+              }}
+            >
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
 
-      {meta.editedRows[row.index] && (
-        <div className="flex">
+      {meta.editingIndex === row.index && (
+        <div>
           <Button
             onClick={() => {
-              meta.saveRow(row.index), changeEditStatus();
+              meta.saveRow(row.index), meta.setEditingIndex(null);
             }}
+            className="p-0"
             variant="ghost"
-            size="icon"
+            // size="icon"
           >
             <Check className="h-4 w-4" />
           </Button>
-          <Button
+          {/* <Button
             onClick={() => {
-              meta.revertRow(row.index), changeEditStatus();
+              meta.revertRow(row.index), meta.setEditingIndex(null);
             }}
             variant="ghost"
             size="icon"
           >
             <Minus className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </div>
       )}
     </div>

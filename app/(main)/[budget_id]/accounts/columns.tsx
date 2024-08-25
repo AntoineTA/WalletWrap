@@ -1,9 +1,10 @@
 "use client";
 
 import { type ColumnDef, type RowData } from "@tanstack/react-table";
-import { EditCell } from "./EditCell";
+import { HeaderCheckboxCell, CheckboxCell } from "./CheckboxCells";
 import { TableCell, DateCell, AmountCell } from "./InputCells";
 import { AccountCell } from "./SelectCells";
+import { EditCell } from "./EditCell";
 import type { Transaction } from "./TransactionTable";
 
 declare module "@tanstack/react-table" {
@@ -18,8 +19,16 @@ declare module "@tanstack/react-table" {
 
 export const columns: ColumnDef<Transaction>[] = [
   {
+    id: "checkbox",
+    header: HeaderCheckboxCell,
+    cell: CheckboxCell,
+    size: 10,
+    enableResizing: false,
+  },
+  {
     accessorKey: "date",
     cell: DateCell,
+    size: 150,
     meta: {
       type: "date",
     },
@@ -28,6 +37,7 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: "account_id",
     header: "account",
     cell: AccountCell,
+    size: 100,
     meta: {
       filter: {
         enabled: true,
@@ -39,6 +49,7 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "note",
     cell: TableCell,
+    size: 200,
     meta: {
       filter: {
         enabled: true,
@@ -49,6 +60,7 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "outflow",
     cell: AmountCell,
+    size: 100,
     meta: {
       type: "number",
     },
@@ -56,6 +68,7 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "inflow",
     cell: AmountCell,
+    size: 100,
     meta: {
       type: "number",
     },
@@ -63,5 +76,6 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     id: "edit",
     cell: EditCell,
+    size: 10,
   },
 ];

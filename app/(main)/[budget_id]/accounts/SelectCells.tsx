@@ -35,7 +35,7 @@ const SelectCell = ({
   const meta = table.options.meta!;
   const id: number = getValue();
 
-  if (meta.editedRows[row.index]) {
+  if (meta.editingIndex === row.index) {
     return (
       <Select
         onValueChange={(value) => {
