@@ -1,7 +1,15 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { Transaction } from "./TransactionTable";
+
+export type InboundTransaction = {
+  id: number | undefined;
+  account_id: number;
+  date: string;
+  outflow: number | null;
+  inflow: number | null;
+  note: string | null;
+};
 
 export const getTransactions = async (budget_id: number) => {
   const supabase = createClient();
@@ -34,12 +42,14 @@ export const getTransactions = async (budget_id: number) => {
   return { transactions };
 };
 
-export const upsertTransaction = async (data: Transaction) => {
+export const upsertTransaction = async (data: InboundTransaction) => {
   const supabase = createClient();
 
-  const { error } = await supabase
+  const { data: transaction, error } = await supabase
     .from("transactions")
-    .upsert(data, { onConflict: "id", ignoreDuplicates: false });
+    .upsert(data, { onConflict: "id", ignoreDuplicates: false })
+    .select()
+    .single();
 
   if (error)
     return {
@@ -50,7 +60,7 @@ export const upsertTransaction = async (data: Transaction) => {
       },
     };
 
-  return { error: null };
+  return { transaction };
 };
 
 export const deleteTransactions = async (ids: number[]) => {

@@ -30,9 +30,7 @@ const EditCell = ({ row, table }: EditCellProps) => {
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() => {
-                if (meta.editingIndex !== null)
-                  // If there is a row being edited, revert it
-                  meta.revertRow(meta.editingIndex);
+                meta.revertChanges();
                 meta.setEditingIndex(row.index);
               }}
             >
@@ -40,8 +38,7 @@ const EditCell = ({ row, table }: EditCellProps) => {
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
-                if (meta.editingIndex !== null)
-                  meta.revertRow(meta.editingIndex);
+                meta.revertChanges();
                 meta.removeRow(row.index);
               }}
             >
@@ -52,27 +49,13 @@ const EditCell = ({ row, table }: EditCellProps) => {
       )}
 
       {meta.editingIndex === row.index && (
-        <div>
-          <Button
-            onClick={() => {
-              meta.saveRow(row.index), meta.setEditingIndex(null);
-            }}
-            className="p-0"
-            variant="ghost"
-            // size="icon"
-          >
-            <Check className="h-4 w-4" />
-          </Button>
-          {/* <Button
-            onClick={() => {
-              meta.revertRow(row.index), meta.setEditingIndex(null);
-            }}
-            variant="ghost"
-            size="icon"
-          >
-            <Minus className="h-4 w-4" />
-          </Button> */}
-        </div>
+        <Button
+          onClick={() => meta.saveRow(row.index)}
+          className="p-0"
+          variant="ghost"
+        >
+          <Check className="h-4 w-4" />
+        </Button>
       )}
     </div>
   );

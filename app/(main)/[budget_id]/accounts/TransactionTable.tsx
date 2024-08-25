@@ -21,22 +21,18 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { AddRowButton, RemoveRowsButton } from "./ControlButtons";
-import {
-  deleteTransactions,
-  getAccounts,
-  getTransactions,
-  upsertTransaction,
-} from "./actions";
+import { AddRowButton, CancelButton, RemoveRowsButton } from "./ControlButtons";
+import { useTableData } from "./hooks";
 import { Error, ErrorAlert } from "@/components/ui/error-alert";
 
 export type Transaction = {
-  id: number;
-  account_id: number;
-  date: string;
+  id: number | undefined;
+  account_id: number | undefined;
+  date: string | undefined;
   outflow: number | null;
   inflow: number | null;
   note: string | null;
+  local_id?: number | undefined;
 };
 
 type SelectOptions = {
@@ -50,7 +46,7 @@ declare module "@tanstack/react-table" {
     setEditingIndex: (index: number | null) => void;
     updateCell: (rowIndex: number, columnId: string, value: any) => void;
     saveRow: (rowIndex: number) => void;
-    revertRow: (rowIndex: number) => void;
+    revertChanges: () => void;
     addRow: () => void;
     removeRow: (rowIndex: number) => void;
     removeRows: (rowIndices: number[]) => void;
@@ -66,79 +62,61 @@ export function TransactionTable({
   columns,
   budget_id,
 }: TransactionTableProps) {
+  const {
+    getTableData,
+    getAccountOptions,
+    deleteDistant,
+    upsertDistant,
+    upserted,
+    error,
+  } = useTableData();
   const [data, setData] = useState<Transaction[]>([]); // store the data currently contained by the table
   const [savedData, setSavedData] = useState<Transaction[]>([]); // store the data from before an edit
-  const [toggleSync, setToggleSync] = useState(false);
+  const [localId, setLocalId] = useState<number>(0);
   const [selectOptions, setSelectOptions] = useState<SelectOptions>({
     accounts: [],
   });
-  // const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [error, setError] = useState<Error | null>(null);
   const [isPending, setIsPending] = useState(true);
 
   // on mount, load the data
   useEffect(() => {
     (async () => {
-      // setIsPending(true);
+      setIsPending(true);
+      const transactions = await getTableData(budget_id);
+      const accountOptions = await getAccountOptions(budget_id);
 
-      const { accounts } = await getAccounts(budget_id);
-      if (!accounts) {
-        setError({
-          title: "Something went wrong",
-          message: "We could not load your data",
-        });
-        return;
-      }
-      const accountsOptions = accounts.map((account) => ({
-        id: account.id,
-        label: account.name,
-      }));
-      setSelectOptions({ accounts: accountsOptions });
-
-      const { transactions, error } = await getTransactions(budget_id);
-      if (!transactions) {
-        setError({
-          title: "We could not load your transactions",
-          message: error.message,
-          code: error.code,
-        });
-        return;
-      }
-      setData(transactions);
-      setSavedData(transactions);
+      if (transactions) setSavedData(transactions);
+      if (accountOptions) setSelectOptions({ accounts: accountOptions });
 
       setIsPending(false);
     })();
   }, []);
 
-  // when the table data changes, load the transactions
   useEffect(() => {
-    (async () => {
-      const { transactions, error } = await getTransactions(budget_id);
-      if (!transactions) {
-        setError({
-          title: "We could not load your transactions",
-          message: error.message,
-          code: error.code,
-        });
-        return;
-      }
-      // setSavedData(transactions);
-      setData(transactions);
-    })();
-  }, [toggleSync]);
+    console.log("upserted", upserted);
+    if (!upserted) return;
+
+    // If upsert is over, we can update the new row with the db id
+    if (upserted) {
+      data.map((row) => {
+        if (row.local_id === upserted.local_id) {
+          row.id = upserted.db_id;
+        }
+      });
+    }
+  }, [upserted]);
+
+  useEffect(() => {
+    setData(savedData);
+  }, [savedData]);
 
   const table = useReactTable({
     columns,
     data,
     getCoreRowModel: getCoreRowModel(),
-    // onColumnFiltersChange: setColumnFilters,
-    // getFilteredRowModel: getFilteredRowModel(),
     enableRowSelection: true,
-    state: {
-      // columnFilters,
-    },
+    state: {},
     meta: {
       editingIndex,
       setEditingIndex,
@@ -156,70 +134,58 @@ export function TransactionTable({
           }),
         );
       },
-      saveRow: async (rowIndex) => {
-        const updated = [...data].sort(
-          (a, b) => new Date(b.date).getDate() - new Date(a.date).getDate(),
-        ); // sort by date descending
-        setData(updated);
-        // setSavedData(updated);
+      saveRow: (rowIndex) => {
+        let toSave = data[rowIndex];
 
-        const { error } = await upsertTransaction(data[rowIndex]);
-        if (error) {
-          setError(error);
-          return;
+        // If the row was just added, we need a local_id to keep track of it
+        if (!toSave.id) {
+          toSave.local_id = localId;
+          setLocalId(localId + 1);
         }
-        // setToggleSync(!toggleSync);
+
+        // sort by date descending
+        const updated = [...data].sort((a, b) => {
+          if (!b.date) return 1;
+          if (!a.date) return -1;
+          return new Date(b.date).getDate() - new Date(a.date).getDate();
+        });
+        setSavedData(updated);
+
+        upsertDistant(toSave);
+        setEditingIndex(null);
       },
-      revertRow: (rowIndex) => {
-        setData((old) =>
-          old
-            .map((row, index) =>
-              index === rowIndex ? savedData[rowIndex] : row,
-            )
-            .filter((row) => row !== undefined),
-        );
+      revertChanges: () => {
+        setEditingIndex(null);
+        setData(savedData);
       },
       addRow: () => {
         setData((old) => {
-          return [{} as Transaction, ...old];
+          return [
+            {
+              id: undefined,
+              account_id: undefined,
+              date: undefined,
+              note: null,
+              outflow: null,
+              inflow: null,
+              local_id: undefined,
+            },
+            ...old,
+          ];
         });
         setEditingIndex(0); //set the new row in edit mode
       },
-      removeRow: async (rowIndex) => {
+      removeRow: (rowIndex) => {
+        deleteDistant([data[rowIndex].id]);
         const updated = data.filter((_row, index) => index !== rowIndex);
-        setData(updated);
-
-        const id = savedData[rowIndex]?.id;
-        if (!id) {
-          // data was not saved yet
-          return;
-        }
-        const { error } = await deleteTransactions([id]);
-        if (error) {
-          setError(error);
-          return;
-        }
-        setToggleSync(!toggleSync);
+        setSavedData(updated);
       },
-      removeRows: async (rowsIndices) => {
+      removeRows: (rowsIndices) => {
+        deleteDistant(rowsIndices.map((index) => data[index].id));
         const updated = data.filter(
           (_row, index) => !rowsIndices.includes(index),
         );
-        setData(updated);
-
-        const ids = rowsIndices
-          .map((index) => savedData[index].id)
-          .filter((id) => id !== undefined);
-        if (ids.length === 0) {
-          //rows were not saved yet
-          return;
-        }
-        const { error } = await deleteTransactions(ids);
-        if (error) {
-          setError(error);
-          return;
-        }
-        setToggleSync(!toggleSync);
+        setSavedData(updated);
       },
     },
   });
@@ -230,6 +196,7 @@ export function TransactionTable({
 
       <div className="flex items-center py-4">
         <AddRowButton table={table} />
+        {editingIndex !== null ? <CancelButton table={table} /> : null}
         {table.getSelectedRowModel().rows.length > 0 ? (
           <RemoveRowsButton table={table} />
         ) : null}
@@ -280,7 +247,7 @@ export function TransactionTable({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-12 text-center"
                 >
                   {isPending && <span>Loading...</span>}
                   {!isPending && <span>No transactions found</span>}
