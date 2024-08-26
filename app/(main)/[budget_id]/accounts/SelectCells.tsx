@@ -13,15 +13,14 @@ export type SelectCellProps = {
   row: Row<Transaction>;
   column: Column<Transaction>;
   table: Table<Transaction>;
-  options: { id: number; label: string }[];
+  options?: { id: number; label: string }[];
 };
 
 export const AccountCell = ({
   table,
   ...props
 }: Omit<SelectCellProps, "options">) => {
-  const options: { id: number; label: string }[] =
-    table.options.meta!.selectOptions.accounts;
+  const options = table.options.meta!.selectOptions?.accounts;
   return <SelectCell table={table} options={options} {...props} />;
 };
 
@@ -35,6 +34,10 @@ const SelectCell = ({
   const meta = table.options.meta!;
   const id: number = getValue();
 
+  if (!options) {
+    return;
+  }
+
   if (meta.editingIndex === row.index) {
     return (
       <Select
@@ -47,9 +50,9 @@ const SelectCell = ({
           <SelectValue
             placeholder={
               options.find((option) => option.id === id)?.label ||
-              "Select account"
+              "Select an option"
             }
-          ></SelectValue>
+          />
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (

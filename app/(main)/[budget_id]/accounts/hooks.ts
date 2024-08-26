@@ -1,22 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   deleteTransactions,
   upsertTransaction,
   getTransactions,
   getAccounts,
+  getBudget,
 } from "./actions";
 import type { Transaction } from "./TransactionTable";
 import type { InboundTransaction } from "./actions";
 import type { Error } from "@/components/ui/error-alert";
+import type { SelectOptions } from "./TransactionTable";
 
-export const useTableData = () => {
+export const useTransactionTable = (budget_id: number) => {
+  const [transactions, setTransactions] = useState<Transaction[] | undefined>();
+  const [selectOptions, setSelectOptions] = useState<SelectOptions>(undefined);
   const [upserted, setUpserted] = useState<{
     db_id: number;
     local_id?: number;
   }>();
   const [error, setError] = useState<Error | null>(null);
 
-  const getTableData = async (budget_id: number) => {
+  const getTableData = async () => {
     const { transactions, error } = await getTransactions(budget_id);
 
     if (!transactions) {
@@ -28,10 +32,10 @@ export const useTableData = () => {
       return;
     }
 
-    return transactions;
+    setTransactions(transactions);
   };
 
-  const getAccountOptions = async (budget_id: number) => {
+  const getAccountOptions = async () => {
     const { accounts, error } = await getAccounts(budget_id);
 
     if (!accounts) {
@@ -43,12 +47,12 @@ export const useTableData = () => {
       return;
     }
 
-    const options = accounts.map((account) => ({
+    const accountOptions = accounts.map((account) => ({
       id: account.id,
       label: account.name,
     }));
 
-    return options;
+    setSelectOptions({ accounts: accountOptions });
   };
 
   const upsertDistant = async (transaction: Transaction) => {
@@ -96,12 +100,65 @@ export const useTableData = () => {
     }
   };
 
+  useEffect(() => {
+    console.log("fetching data from useTableData hook");
+    getTableData();
+    getAccountOptions();
+  }, []);
+
   return {
-    getTableData,
-    getAccountOptions,
+    savedData: transactions,
+    setSavedData: setTransactions,
+    selectOptions,
     upsertDistant,
     deleteDistant,
     upserted,
     error,
   };
+};
+
+export const useAccountPage = (budget_id: number) => {
+  const [error, setError] = useState<Error | null>(null);
+  const [budgetName, setBudgetName] = useState<string | undefined>();
+  const [balance, setBalance] = useState<number | undefined>();
+
+  const getBudgetName = async () => {
+    const { budget, error } = await getBudget(budget_id);
+
+    if (!budget) {
+      setError({
+        title: "Could not fetch budget",
+        message: error.message,
+        code: error.code,
+      });
+      return;
+    }
+
+    setBudgetName(budget.name);
+  };
+
+  const getBalance = async () => {
+    const { accounts, error } = await getAccounts(budget_id);
+
+    if (!accounts) {
+      setError({
+        title: "Could not fetch accounts",
+        message: error.message,
+        code: error.code,
+      });
+      return;
+    }
+
+    const balance = accounts.reduce((acc, account) => acc + account.balance, 0);
+
+    setBalance(balance);
+  };
+
+  useEffect(() => {
+    console.log("fetching data from useAccountPage hook");
+    getBudgetName();
+    getBalance();
+  });
+
+  return { budgetName, balance, error };
 };

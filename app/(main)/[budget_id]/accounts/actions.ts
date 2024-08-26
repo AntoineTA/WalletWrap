@@ -99,3 +99,24 @@ export const getAccounts = async (budget_id: number) => {
 
   return { accounts: data };
 };
+
+export const getBudget = async (budget_id: number) => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("budgets")
+    .select()
+    .eq("id", budget_id)
+    .single();
+
+  if (!data)
+    return {
+      error: {
+        title: "Could not fetch budget",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { budget: data };
+};

@@ -39,10 +39,7 @@ export default async function MainLayout({
           </div>
         </div>
         <div className="flex flex-col">
-          <main>
-            Main
-            {children}
-          </main>
+          <main>{children}</main>
           <BottomNav />
         </div>
       </div>
