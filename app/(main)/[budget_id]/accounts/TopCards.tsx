@@ -35,17 +35,15 @@ export const AccountCard = ({
 };
 
 export const BalanceCard = ({ balance }: { balance?: number }) => {
-  const formattedBalance = balance?.toFixed(2);
-
   return (
     <div className="w-52">
       <Card>
         <CardHeader>
-          {balance ? (
+          {balance !== undefined ? (
             <CardTitle
               className={balance < 0 ? "text-red-500" : "text-green-500"}
             >
-              {formattedBalance}
+              {balance.toFixed(2)}
             </CardTitle>
           ) : (
             <Skeleton className="h-6 w-28" />

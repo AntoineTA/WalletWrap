@@ -5,6 +5,9 @@ import {
   getTransactions,
   getAccounts,
   getBudget,
+  updateAccount,
+  getAccount,
+  getAccountsView,
 } from "./actions";
 import type { Transaction } from "./TransactionTable";
 import type { InboundTransaction } from "./actions";
@@ -65,8 +68,15 @@ export const useTransactionTable = (budget_id: number) => {
       return;
     }
 
+    // change empty string to null
+    const cleanTransaction = {
+      ...transaction,
+      outflow: transaction.outflow || null,
+      inflow: transaction.inflow || null,
+    };
+
     // Remove the local_id from the data sent to the server
-    const { local_id, ...inbound } = transaction;
+    const { local_id, ...inbound } = cleanTransaction;
 
     const { transaction: data, error } = await upsertTransaction(
       inbound as InboundTransaction,
@@ -117,10 +127,9 @@ export const useTransactionTable = (budget_id: number) => {
   };
 };
 
-export const useAccountPage = (budget_id: number) => {
+export const useTopCards = (budget_id: number) => {
   const [error, setError] = useState<Error | null>(null);
   const [budgetName, setBudgetName] = useState<string | undefined>();
-  const [balance, setBalance] = useState<number | undefined>();
 
   const getBudgetName = async () => {
     const { budget, error } = await getBudget(budget_id);
@@ -138,7 +147,7 @@ export const useAccountPage = (budget_id: number) => {
   };
 
   const getBalance = async () => {
-    const { accounts, error } = await getAccounts(budget_id);
+    const { accounts, error } = await getAccountsView(budget_id);
 
     if (!accounts) {
       setError({
@@ -149,16 +158,19 @@ export const useAccountPage = (budget_id: number) => {
       return;
     }
 
-    const balance = accounts.reduce((acc, account) => acc + account.balance, 0);
+    console.log("accounts", accounts);
 
-    setBalance(balance);
+    const balance = accounts
+      .map((account) => account.balance || 0)
+      .reduce((acc, curr) => acc + curr, 0);
+    console.log("balance", balance);
+    return balance;
   };
 
   useEffect(() => {
     console.log("fetching data from useAccountPage hook");
     getBudgetName();
-    getBalance();
   });
 
-  return { budgetName, balance, error };
+  return { budgetName, getBalance, error };
 };

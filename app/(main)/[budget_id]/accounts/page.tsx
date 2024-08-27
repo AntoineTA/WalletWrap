@@ -1,15 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AccountCard, BalanceCard } from "./TopCards";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { columns } from "./columns";
 import { TransactionTable } from "./TransactionTable";
-import { useEffect } from "react";
-import { useAccountPage } from "./hooks";
+import { useTopCards } from "./hooks";
 
 const Accounts = ({ params }: { params: { budget_id: number } }) => {
-  const { budgetName, balance, error } = useAccountPage(params.budget_id);
+  const { budgetName, getBalance, error } = useTopCards(params.budget_id);
+  const [balance, setBalance] = useState<number | undefined>();
+
+  useEffect(() => {
+    (async () => {
+      const balance = await getBalance();
+      setBalance(balance);
+    })();
+  }, [params.budget_id]);
 
   return (
     <div className="container mx-auto my-8">
@@ -22,7 +29,12 @@ const Accounts = ({ params }: { params: { budget_id: number } }) => {
           </div>
         )}
       </div>
-      <TransactionTable budget_id={params.budget_id} columns={columns} />
+      <TransactionTable
+        budget_id={params.budget_id}
+        columns={columns}
+        balance={balance}
+        setBalance={setBalance}
+      />
     </div>
   );
 };

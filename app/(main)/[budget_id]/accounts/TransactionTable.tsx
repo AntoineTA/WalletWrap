@@ -4,12 +4,8 @@ import { useEffect, useState } from "react";
 
 import {
   ColumnDef,
-  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  SortingState,
   useReactTable,
   type RowData,
 } from "@tanstack/react-table";
@@ -57,11 +53,15 @@ declare module "@tanstack/react-table" {
 type TransactionTableProps = {
   columns: ColumnDef<Transaction>[];
   budget_id: number;
+  balance: number | undefined;
+  setBalance: (balance: number) => void;
 };
 
 export function TransactionTable({
   columns,
   budget_id,
+  balance,
+  setBalance,
 }: TransactionTableProps) {
   const {
     savedData,
@@ -119,11 +119,23 @@ export function TransactionTable({
         );
       },
       saveRow: (rowIndex) => {
-        let toSave = data[rowIndex];
+        const oldRow = savedData ? savedData[rowIndex] : null;
+        const newRow = data[rowIndex];
+
+        if (!newRow.account_id) {
+          console.error("Account is required");
+          return;
+        }
+        if (balance === undefined) {
+          console.error("Balance could not be loaded");
+          return;
+        }
+
+        setEditingIndex(null);
 
         // If the row was just added, we need a local_id to keep track of it
-        if (!toSave.id) {
-          toSave.local_id = localId;
+        if (!newRow.id) {
+          newRow.local_id = localId;
           setLocalId(localId + 1);
         }
 
@@ -133,10 +145,23 @@ export function TransactionTable({
           if (!a.date) return -1;
           return new Date(b.date).getDate() - new Date(a.date).getDate();
         });
-        setSavedData(updated);
 
-        upsertDistant(toSave);
-        setEditingIndex(null);
+        // update the data in the table and remotely
+        setSavedData(updated);
+        upsertDistant(newRow);
+
+        let diff = 0;
+        // If the row was updated
+        if (oldRow && oldRow.id === newRow.id) {
+          //we take the difference between the old and new inflow/outflow
+          const diffInflow = (newRow.inflow || 0) - (oldRow.inflow || 0);
+          const diffOutflow = (newRow.outflow || 0) - (oldRow.outflow || 0);
+          diff = diffInflow - diffOutflow;
+        } else {
+          // we get the difference between the current inflow and outflow
+          diff = (newRow.inflow || 0) - (newRow.outflow || 0);
+        }
+        setBalance(balance + diff);
       },
       revertChanges: () => {
         if (!savedData) return;
@@ -161,11 +186,32 @@ export function TransactionTable({
         setEditingIndex(0); //set the new row in edit mode
       },
       removeRow: (rowIndex) => {
-        deleteDistant([data[rowIndex].id]);
+        const removedRow = data[rowIndex];
+
+        // update balance
+        if (balance === undefined) {
+          console.error("Balance could not be loaded");
+          return;
+        }
+        const diff = (removedRow.inflow || 0) - (removedRow.outflow || 0);
+        setBalance(balance - diff);
+
+        deleteDistant([removedRow.id]);
         const updated = data.filter((_row, index) => index !== rowIndex);
         setSavedData(updated);
       },
       removeRows: (rowsIndices) => {
+        // update balance
+        if (balance === undefined) {
+          console.error("Balance could not be loaded");
+          return;
+        }
+        const diff = rowsIndices.reduce((acc, index) => {
+          const row = data[index];
+          return acc + ((row.inflow || 0) - (row.outflow || 0));
+        }, 0);
+        setBalance(balance - diff);
+
         deleteDistant(rowsIndices.map((index) => data[index].id));
         const updated = data.filter(
           (_row, index) => !rowsIndices.includes(index),

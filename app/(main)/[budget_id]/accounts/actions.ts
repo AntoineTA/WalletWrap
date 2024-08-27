@@ -100,6 +100,70 @@ export const getAccounts = async (budget_id: number) => {
   return { accounts: data };
 };
 
+export const getAccount = async (account_id: number) => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("accounts")
+    .select()
+    .eq("id", account_id)
+    .single();
+
+  if (!data)
+    return {
+      error: {
+        title: "Could not fetch account",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { account: data };
+};
+
+export const getAccountsView = async (budget_id: number) => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("accounts_view")
+    .select()
+    .eq("budget_id", budget_id);
+
+  if (!data)
+    return {
+      error: {
+        title: "Could not fetch accounts",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { accounts: data };
+};
+
+export const updateAccount = async (
+  account_id: number,
+  data: { name?: string; balance?: number },
+) => {
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from("accounts")
+    .update(data)
+    .eq("id", account_id);
+
+  if (error)
+    return {
+      error: {
+        title: "Could not update account",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { error: null };
+};
+
 export const getBudget = async (budget_id: number) => {
   const supabase = createClient();
 
