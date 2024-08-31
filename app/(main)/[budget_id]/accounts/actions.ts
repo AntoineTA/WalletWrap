@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import { Envelope } from "../hooks";
 
 export type InboundTransaction = {
   id: number | undefined;
@@ -9,6 +10,7 @@ export type InboundTransaction = {
   outflow: number | null;
   inflow: number | null;
   note: string | null;
+  envelope_id: number | null;
 };
 
 export const getTransactions = async (budget_id: number) => {
@@ -36,6 +38,7 @@ export const getTransactions = async (budget_id: number) => {
       outflow: transaction.outflow,
       inflow: transaction.inflow,
       note: transaction.note,
+      envelope_id: transaction.envelope_id,
     }));
   });
 
@@ -183,4 +186,44 @@ export const getBudget = async (budget_id: number) => {
     };
 
   return { budget: data };
+};
+
+export const getEnvelopes = async (budget_id: number) => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("envelopes")
+    .select()
+    .eq("budget_id", budget_id);
+
+  if (!data)
+    return {
+      error: {
+        title: "Could not fetch envelope",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { envelopes: data };
+};
+
+export const getEnvelopesView = async (budget_id: number) => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("envelopes_view")
+    .select()
+    .eq("budget_id", budget_id);
+
+  if (!data)
+    return {
+      error: {
+        title: "Could not fetch envelopes",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { envelopes: data as Envelope[] };
 };

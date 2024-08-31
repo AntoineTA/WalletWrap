@@ -24,6 +24,14 @@ export const AccountCell = ({
   return <SelectCell table={table} options={options} {...props} />;
 };
 
+export const EnvelopeCell = ({
+  table,
+  ...props
+}: Omit<SelectCellProps, "options">) => {
+  const options = table.options.meta!.selectOptions?.envelopes;
+  return <SelectCell table={table} options={options} {...props} />;
+};
+
 const SelectCell = ({
   getValue,
   row,

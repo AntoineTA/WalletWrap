@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AccountCard, BalanceCard } from "./TopCards";
+import { AccountInfoCard, AccountBalanceCard } from "./TopCards";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { columns } from "./columns";
 import { TransactionTable } from "./TransactionTable";
@@ -24,8 +24,13 @@ const Accounts = ({ params }: { params: { budget_id: number } }) => {
         {error && <ErrorAlert {...error} />}
         {!error && (
           <div className="flex justify-start gap-4">
-            {<AccountCard accountName="All Accounts" budgetName={budgetName} />}
-            {<BalanceCard balance={balance} />}
+            {
+              <AccountInfoCard
+                accountName="All Accounts"
+                budgetName={budgetName}
+              />
+            }
+            {<AccountBalanceCard balance={balance} />}
           </div>
         )}
       </div>

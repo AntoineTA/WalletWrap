@@ -28,17 +28,19 @@ export type Transaction = {
   outflow: number | null;
   inflow: number | null;
   note: string | null;
+  envelope_id: number | null;
   local_id?: number | undefined;
 };
 
 export type SelectOptions =
   | {
       accounts: { id: number; label: string }[];
+      envelopes: { id: number; label: string }[];
     }
   | undefined;
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
-    selectOptions: SelectOptions;
+    selectOptions?: SelectOptions;
     editingIndex: number | null;
     setEditingIndex: (index: number | null) => void;
     updateCell: (rowIndex: number, columnId: string, value: any) => void;
@@ -77,7 +79,6 @@ export function TransactionTable({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    console.log("upserted", upserted);
     if (!upserted) return;
 
     // If upsert is over, we can update the new row with the db id
@@ -178,6 +179,7 @@ export function TransactionTable({
               note: null,
               outflow: null,
               inflow: null,
+              envelope_id: null,
               local_id: undefined,
             },
             ...old,
@@ -227,7 +229,10 @@ export function TransactionTable({
       {!error && (
         <div>
           <div className="flex items-center py-4">
-            <AddRowButton table={table} />
+            <AddRowButton
+              table={table}
+              disabled={!(savedData && selectOptions)}
+            />
             {editingIndex !== null ? <CancelButton table={table} /> : null}
             {table.getSelectedRowModel().rows.length > 0 ? (
               <RemoveRowsButton table={table} />
@@ -271,6 +276,7 @@ export function TransactionTable({
                             cell.column.columnDef.cell,
                             cell.getContext(),
                           )}
+                          {row.getValue("note")}
                         </TableCell>
                       ))}
                     </TableRow>

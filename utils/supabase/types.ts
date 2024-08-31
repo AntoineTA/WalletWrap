@@ -76,6 +76,38 @@ export type Database = {
           },
         ];
       };
+      envelopes: {
+        Row: {
+          budget_id: number;
+          budgeted: number;
+          description: string | null;
+          id: number;
+          name: string;
+        };
+        Insert: {
+          budget_id: number;
+          budgeted?: number;
+          description?: string | null;
+          id?: number;
+          name: string;
+        };
+        Update: {
+          budget_id?: number;
+          budgeted?: number;
+          description?: string | null;
+          id?: number;
+          name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "envelopes_budget_id_fkey";
+            columns: ["budget_id"];
+            isOneToOne: false;
+            referencedRelation: "budgets";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       settings: {
         Row: {
           has_mfa: boolean;
@@ -106,6 +138,7 @@ export type Database = {
         Row: {
           account_id: number;
           date: string;
+          envelope_id: number | null;
           id: number;
           inflow: number | null;
           note: string | null;
@@ -114,6 +147,7 @@ export type Database = {
         Insert: {
           account_id: number;
           date: string;
+          envelope_id?: number | null;
           id?: number;
           inflow?: number | null;
           note?: string | null;
@@ -122,6 +156,7 @@ export type Database = {
         Update: {
           account_id?: number;
           date?: string;
+          envelope_id?: number | null;
           id?: number;
           inflow?: number | null;
           note?: string | null;
@@ -142,6 +177,20 @@ export type Database = {
             referencedRelation: "accounts_view";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "transactions_envelope_id_fkey";
+            columns: ["envelope_id"];
+            isOneToOne: false;
+            referencedRelation: "envelopes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "transactions_envelope_id_fkey";
+            columns: ["envelope_id"];
+            isOneToOne: false;
+            referencedRelation: "envelopes_view";
+            referencedColumns: ["id"];
+          },
         ];
       };
     };
@@ -159,6 +208,25 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "Accounts_budget_fkey";
+            columns: ["budget_id"];
+            isOneToOne: false;
+            referencedRelation: "budgets";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      envelopes_view: {
+        Row: {
+          budget_id: number | null;
+          budgeted: number | null;
+          description: string | null;
+          id: number | null;
+          name: string | null;
+          spent: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "envelopes_budget_id_fkey";
             columns: ["budget_id"];
             isOneToOne: false;
             referencedRelation: "budgets";

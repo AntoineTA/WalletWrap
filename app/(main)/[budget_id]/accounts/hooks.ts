@@ -5,9 +5,9 @@ import {
   getTransactions,
   getAccounts,
   getBudget,
-  updateAccount,
-  getAccount,
   getAccountsView,
+  getEnvelopesView,
+  getEnvelopes,
 } from "./actions";
 import type { Transaction } from "./TransactionTable";
 import type { InboundTransaction } from "./actions";
@@ -38,14 +38,14 @@ export const useTransactionTable = (budget_id: number) => {
     setTransactions(transactions);
   };
 
-  const getAccountOptions = async () => {
-    const { accounts, error } = await getAccounts(budget_id);
+  const getOptions = async () => {
+    const { accounts } = await getAccounts(budget_id);
+    const { envelopes } = await getEnvelopes(budget_id);
 
-    if (!accounts) {
+    if (!accounts || !envelopes) {
       setError({
-        title: "Could not fetch accounts",
-        message: error.message,
-        code: error.code,
+        title: "We could not load the table options",
+        message: "Please try again.",
       });
       return;
     }
@@ -54,8 +54,12 @@ export const useTransactionTable = (budget_id: number) => {
       id: account.id,
       label: account.name,
     }));
+    const envelopeOptions = envelopes.map((envelope) => ({
+      id: envelope.id,
+      label: envelope.name,
+    }));
 
-    setSelectOptions({ accounts: accountOptions });
+    setSelectOptions({ accounts: accountOptions, envelopes: envelopeOptions });
   };
 
   const upsertDistant = async (transaction: Transaction) => {
@@ -111,9 +115,8 @@ export const useTransactionTable = (budget_id: number) => {
   };
 
   useEffect(() => {
-    console.log("fetching data from useTableData hook");
     getTableData();
-    getAccountOptions();
+    getOptions();
   }, []);
 
   return {
@@ -158,17 +161,13 @@ export const useTopCards = (budget_id: number) => {
       return;
     }
 
-    console.log("accounts", accounts);
-
     const balance = accounts
       .map((account) => account.balance || 0)
       .reduce((acc, curr) => acc + curr, 0);
-    console.log("balance", balance);
     return balance;
   };
 
   useEffect(() => {
-    console.log("fetching data from useAccountPage hook");
     getBudgetName();
   });
 

@@ -5,9 +5,10 @@ import type { Transaction } from "./TransactionTable";
 
 type ControlButtonsProps = {
   table: Table<Transaction>;
+  disabled?: boolean;
 };
 
-export const AddRowButton = ({ table }: ControlButtonsProps) => {
+export const AddRowButton = ({ table, disabled }: ControlButtonsProps) => {
   const meta = table.options.meta!;
 
   const handleClick = () => {
@@ -16,7 +17,7 @@ export const AddRowButton = ({ table }: ControlButtonsProps) => {
   };
 
   return (
-    <Button onClick={handleClick} variant="ghost">
+    <Button onClick={handleClick} variant="ghost" disabled={disabled}>
       <Plus className="mr-2 h-4 w-4" />
       Add
     </Button>

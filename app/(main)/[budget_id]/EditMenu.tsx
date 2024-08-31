@@ -1,20 +1,20 @@
-import { Button } from "@/components/ui/button";
-import { Check, MoreHorizontal } from "lucide-react";
+import type { Envelope } from "./EnvelopeGrid";
+import type { Table, Row } from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Table, Row } from "@tanstack/react-table";
-import type { Transaction } from "./TransactionTable";
+import { Button } from "@/components/ui/button";
+import { Check, MoreHorizontal } from "lucide-react";
 
-type EditCellProps = {
-  row: Row<Transaction>;
-  table: Table<Transaction>;
+type EditMenuProps = {
+  row: Row<Envelope>;
+  table: Table<Envelope>;
 };
 
-const EditCell = ({ row, table }: EditCellProps) => {
+export const EditMenu = ({ row, table }: EditMenuProps) => {
   const meta = table.options.meta!;
 
   return (
@@ -60,4 +60,3 @@ const EditCell = ({ row, table }: EditCellProps) => {
     </div>
   );
 };
-export { EditCell };

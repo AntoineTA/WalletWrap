@@ -3,7 +3,7 @@
 import { type ColumnDef, type RowData } from "@tanstack/react-table";
 import { HeaderCheckboxCell, CheckboxCell } from "./CheckboxCells";
 import { TableCell, DateCell, AmountCell } from "./InputCells";
-import { AccountCell } from "./SelectCells";
+import { AccountCell, EnvelopeCell } from "./SelectCells";
 import { EditCell } from "./EditCell";
 import type { Transaction } from "./TransactionTable";
 
@@ -55,6 +55,19 @@ export const columns: ColumnDef<Transaction>[] = [
         enabled: true,
         name: "Notes",
       },
+    },
+  },
+  {
+    accessorKey: "envelope_id",
+    header: "category",
+    cell: EnvelopeCell,
+    size: 100,
+    meta: {
+      filter: {
+        enabled: true,
+        name: "Envelopes",
+      },
+      type: "select",
     },
   },
   {

@@ -6,21 +6,23 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const AccountInfoCard = ({
-  accountName,
+export const BudgetInfoCard = ({
   budgetName,
+  budgetDesc,
 }: {
-  accountName?: string;
   budgetName?: string;
+  budgetDesc?: string;
 }) => {
   return (
     <div className="w-52">
       <Card>
         <CardHeader>
-          {accountName && budgetName ? (
+          {budgetName && budgetDesc ? (
             <>
-              <CardTitle>{accountName}</CardTitle>
-              <CardDescription>Budget {budgetName}</CardDescription>
+              <CardTitle>{budgetName}</CardTitle>
+              <CardDescription className="truncate hover:text-wrap">
+                {budgetDesc}
+              </CardDescription>
             </>
           ) : (
             <>
@@ -34,21 +36,21 @@ export const AccountInfoCard = ({
   );
 };
 
-export const AccountBalanceCard = ({ balance }: { balance?: number }) => {
+export const BudgetBalanceCard = ({ toBudget }: { toBudget?: number }) => {
   return (
     <div className="w-52">
       <Card>
         <CardHeader>
-          {balance !== undefined ? (
+          {toBudget !== undefined ? (
             <CardTitle
-              className={balance < 0 ? "text-red-500" : "text-green-500"}
+              className={toBudget < 0 ? "text-red-500" : "text-green-500"}
             >
-              {balance.toFixed(2)}
+              {toBudget.toFixed(2)}
             </CardTitle>
           ) : (
             <Skeleton className="h-6 w-28" />
           )}
-          <CardDescription>Balance</CardDescription>
+          <CardDescription>To budget</CardDescription>
         </CardHeader>
       </Card>
     </div>
