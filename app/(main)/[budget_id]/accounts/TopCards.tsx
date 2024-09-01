@@ -5,36 +5,28 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Account } from "./hooks";
 
-export const AccountInfoCard = ({
-  accountName,
-  budgetName,
-}: {
-  accountName?: string;
-  budgetName?: string;
-}) => {
+export const AccountInfoCard = ({ account }: { account: Account }) => {
   return (
     <div className="w-52">
       <Card>
         <CardHeader>
-          {accountName && budgetName ? (
-            <>
-              <CardTitle>{accountName}</CardTitle>
-              <CardDescription>Budget {budgetName}</CardDescription>
-            </>
-          ) : (
-            <>
-              <Skeleton className="h-6 w-28" />
-              <Skeleton className="h-4 w-16" />
-            </>
-          )}
+          <CardTitle
+            className={account.balance < 0 ? "text-red-500" : "text-green-500"}
+          >
+            {account.balance.toFixed(2)}
+          </CardTitle>
+          <CardDescription>
+            {account.name} ({account.type})
+          </CardDescription>
         </CardHeader>
       </Card>
     </div>
   );
 };
 
-export const AccountBalanceCard = ({ balance }: { balance?: number }) => {
+export const BalanceCard = ({ balance }: { balance?: number }) => {
   return (
     <div className="w-52">
       <Card>
@@ -46,9 +38,22 @@ export const AccountBalanceCard = ({ balance }: { balance?: number }) => {
               {balance.toFixed(2)}
             </CardTitle>
           ) : (
-            <Skeleton className="h-6 w-28" />
+            <Skeleton className="h-6 w-20" />
           )}
-          <CardDescription>Balance</CardDescription>
+          <CardDescription>Total Balance</CardDescription>
+        </CardHeader>
+      </Card>
+    </div>
+  );
+};
+
+export const SkeletonAccountInfoCard = () => {
+  return (
+    <div className="w-52">
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-20" />
+          <Skeleton className="h-4 w-24" />
         </CardHeader>
       </Card>
     </div>

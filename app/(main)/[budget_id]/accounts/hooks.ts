@@ -14,6 +14,13 @@ import type { InboundTransaction } from "./actions";
 import type { Error } from "@/components/ui/error-alert";
 import type { SelectOptions } from "./TransactionTable";
 
+export type Account = {
+  id: number;
+  name: string;
+  balance: number;
+  type: string | null;
+};
+
 export const useTransactionTable = (budget_id: number) => {
   const [transactions, setTransactions] = useState<Transaction[] | undefined>();
   const [selectOptions, setSelectOptions] = useState<SelectOptions>(undefined);
@@ -132,27 +139,12 @@ export const useTransactionTable = (budget_id: number) => {
 
 export const useTopCards = (budget_id: number) => {
   const [error, setError] = useState<Error | null>(null);
-  const [budgetName, setBudgetName] = useState<string | undefined>();
+  const [accounts, setAccounts] = useState<Account[] | undefined>();
 
-  const getBudgetName = async () => {
-    const { budget, error } = await getBudget(budget_id);
+  const getAccounts = async () => {
+    const { accounts: data, error } = await getAccountsView(budget_id);
 
-    if (!budget) {
-      setError({
-        title: "Could not fetch budget",
-        message: error.message,
-        code: error.code,
-      });
-      return;
-    }
-
-    setBudgetName(budget.name);
-  };
-
-  const getBalance = async () => {
-    const { accounts, error } = await getAccountsView(budget_id);
-
-    if (!accounts) {
+    if (!data) {
       setError({
         title: "Could not fetch accounts",
         message: error.message,
@@ -161,15 +153,18 @@ export const useTopCards = (budget_id: number) => {
       return;
     }
 
-    const balance = accounts
-      .map((account) => account.balance || 0)
-      .reduce((acc, curr) => acc + curr, 0);
-    return balance;
+    const accounts = data.map((account) => ({
+      id: account.id as number,
+      name: account.name || "",
+      balance: account.balance || 0,
+      type: account.type,
+    }));
+    setAccounts(accounts);
   };
 
   useEffect(() => {
-    getBudgetName();
+    getAccounts();
   });
 
-  return { budgetName, getBalance, error };
+  return { accounts, error };
 };
