@@ -199,7 +199,7 @@ export function TransactionTable({
         setBalance(balance - diff);
 
         deleteDistant([removedRow.id]);
-        const updated = data.filter((_row, index) => index !== rowIndex);
+        const updated = data.filter((_, index) => index !== rowIndex);
         setSavedData(updated);
       },
       removeRows: (rowsIndices) => {

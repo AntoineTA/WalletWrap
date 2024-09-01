@@ -13,6 +13,14 @@ export type InboundTransaction = {
   envelope_id: number | null;
 };
 
+export type InboundEnvelope = {
+  id: number | undefined;
+  name: string;
+  budget_id: number;
+  description: string | null;
+  budgeted: number;
+};
+
 export const getTransactions = async (budget_id: number) => {
   const supabase = createClient();
 
@@ -228,7 +236,7 @@ export const getEnvelopesView = async (budget_id: number) => {
   return { envelopes: data as Envelope[] };
 };
 
-export const upsertEnvelope = async (data: Envelope) => {
+export const upsertEnvelope = async (data: InboundEnvelope) => {
   console.log("upsertEnvelope", data);
   const supabase = createClient();
 
@@ -248,4 +256,21 @@ export const upsertEnvelope = async (data: Envelope) => {
     };
 
   return { envelope };
+};
+
+export const deleteEnvelope = async (id: number) => {
+  const supabase = createClient();
+
+  const { error } = await supabase.from("envelopes").delete().eq("id", id);
+
+  if (error)
+    return {
+      error: {
+        title: "Could not delete envelope",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { error: null };
 };

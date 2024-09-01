@@ -18,16 +18,17 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { AddRowButton } from "./ControlButton";
+import { AddRowButton, CancelButton } from "./ControlButton";
 import { EditMenu } from "./EditMenu";
 import { NumberField, TextField } from "./InputCells";
 import { useEnvelopeGrid } from "./hooks";
+import { ErrorAlert } from "@/components/ui/error-alert";
 
 export type Envelope = {
   id: number | undefined;
   budget_id: number;
   name: string;
-  description: string | undefined;
+  description: string | null;
   budgeted: number;
   spent: number;
   local_id?: number | undefined;
@@ -46,8 +47,14 @@ const EnvelopeGrid = ({
   toBudget,
   setToBudget,
 }: EnvelopeGridProps) => {
-  const { savedData, setSavedData, upsertDistant, upserted, error } =
-    useEnvelopeGrid(budget_id);
+  const {
+    savedData,
+    setSavedData,
+    upsertDistant,
+    deleteDistant,
+    upserted,
+    error,
+  } = useEnvelopeGrid(budget_id);
   const [data, setData] = useState<Envelope[]>([]);
   const [localId, setLocalId] = useState<number>(0);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -117,7 +124,9 @@ const EnvelopeGrid = ({
         }
       },
       revertChanges: () => {
-        console.log("revert changes");
+        if (!savedData) return;
+        setEditingIndex(null);
+        setData(savedData);
       },
       addRow: () => {
         setData((old) => {
@@ -127,7 +136,7 @@ const EnvelopeGrid = ({
               id: undefined,
               budget_id: budget_id,
               name: "",
-              description: undefined,
+              description: null,
               budgeted: 0,
               spent: 0,
             },
@@ -135,8 +144,19 @@ const EnvelopeGrid = ({
         });
         setEditingIndex(data.length);
       },
-      removeRow: () => {
-        console.log("remove envelope");
+      removeRow: (rowIndex) => {
+        const removedRow = data[rowIndex];
+
+        // update remaining budget amount
+        if (toBudget === undefined) {
+          console.error("Budget balance could not be loaded");
+          return;
+        }
+        setToBudget(toBudget + removedRow.budgeted);
+
+        if (removedRow.id) deleteDistant(removedRow.id);
+        const updated = data.filter((_, index) => index !== rowIndex);
+        setSavedData(updated);
       },
       removeRows: () => {
         console.log("remove envelopes");
@@ -149,7 +169,13 @@ const EnvelopeGrid = ({
 
   return (
     <div>
-      <AddRowButton table={table} />
+      {error && <ErrorAlert {...error} />}
+      {!error && (
+        <div className="flex items-center py-4">
+          <AddRowButton table={table} disabled={!savedData} />
+          {editingIndex !== null ? <CancelButton table={table} /> : null}
+        </div>
+      )}
       <div className="flex flex-wrap">
         {table.getRowModel().rows.map((row) => (
           <Card key={row.index} className="m-2 w-full lg:w-80 relative">
@@ -174,7 +200,7 @@ const EnvelopeGrid = ({
                 />
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-between">
+            <CardContent className="flex gap-8 lg:justify-between">
               <div className="text-right">
                 <div className="text-xs mb-1">Budgeted</div>
                 <NumberField

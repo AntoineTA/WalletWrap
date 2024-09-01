@@ -5,6 +5,8 @@ import {
   getEnvelopes,
   getEnvelopesView,
   upsertEnvelope,
+  InboundEnvelope,
+  deleteEnvelope,
 } from "./accounts/actions";
 import type { Error } from "@/components/ui/error-alert";
 import type { Envelope } from "./EnvelopeGrid";
@@ -125,6 +127,18 @@ export const useEnvelopeGrid = (budget_id: number) => {
     setUpserted({ db_id: data.id, local_id });
   };
 
+  const deleteDistant = async (id: number) => {
+    const res = await deleteEnvelope(id);
+
+    if (res.error) {
+      setError({
+        title: "Could not delete envelope",
+        message: res.error.message,
+        code: res.error.code,
+      });
+    }
+  };
+
   useEffect(() => {
     console.log("getting grid data");
     getGridData();
@@ -134,6 +148,7 @@ export const useEnvelopeGrid = (budget_id: number) => {
     savedData: envelopes,
     setSavedData: setEnvelopes,
     upsertDistant,
+    deleteDistant,
     upserted,
     error,
   };

@@ -14,6 +14,11 @@ type EditMenuProps = {
   table: Table<Envelope>;
 };
 
+type DeleteDialogProps = {
+  isDeleting: boolean;
+  setIsDeleting: (isDeleting: boolean) => void;
+};
+
 export const EditMenu = ({ row, table }: EditMenuProps) => {
   const meta = table.options.meta!;
 

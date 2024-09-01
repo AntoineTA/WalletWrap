@@ -23,3 +23,14 @@ export const AddRowButton = ({ table, disabled }: ControlButtonsProps) => {
     </Button>
   );
 };
+
+export const CancelButton = ({ table }: ControlButtonsProps) => {
+  const meta = table.options.meta!;
+
+  return (
+    <Button onClick={meta.revertChanges} variant="ghost">
+      <Minus className="mr-2 h-4 w-4" />
+      Cancel
+    </Button>
+  );
+};
