@@ -20,10 +20,13 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { AddRowButton } from "./ControlButton";
 import { EditMenu } from "./EditMenu";
+import { NumberField, TextField } from "./InputCells";
+import { useEnvelopeGrid } from "./hooks";
 
 export type Envelope = {
   id: number | undefined;
-  name: string | undefined;
+  budget_id: number;
+  name: string;
   description: string | undefined;
   budgeted: number;
   spent: number;
@@ -32,17 +35,40 @@ export type Envelope = {
 
 type EnvelopeGridProps = {
   columns: ColumnDef<Envelope>[];
-  savedData: Envelope[];
+  budget_id: number;
+  toBudget: number | undefined;
+  setToBudget: (toBudget: number) => void;
 };
 
-const EnvelopeGrid = ({ columns, savedData }: EnvelopeGridProps) => {
-  const [data, setData] = useState<Envelope[]>(savedData);
+const EnvelopeGrid = ({
+  columns,
+  budget_id,
+  toBudget,
+  setToBudget,
+}: EnvelopeGridProps) => {
+  const { savedData, setSavedData, upsertDistant, upserted, error } =
+    useEnvelopeGrid(budget_id);
+  const [data, setData] = useState<Envelope[]>([]);
+  const [localId, setLocalId] = useState<number>(0);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
-  // useEffect(() => {
-  //   if (!savedData) return;
-  //   setData(savedData);
-  // }, [savedData]);
+  useEffect(() => {
+    if (!upserted) return;
+
+    // If upsert is over, we can update the new row with the db id
+    if (upserted) {
+      data.map((row) => {
+        if (row.local_id === upserted.local_id) {
+          row.id = upserted.db_id;
+        }
+      });
+    }
+  }, [upserted]);
+
+  useEffect(() => {
+    if (!savedData) return;
+    setData(savedData);
+  }, [savedData]);
 
   const table = useReactTable({
     columns,
@@ -52,10 +78,43 @@ const EnvelopeGrid = ({ columns, savedData }: EnvelopeGridProps) => {
       editingIndex,
       setEditingIndex,
       updateCell: (rowIndex, columnId, value) => {
-        console.log("update cell", rowIndex, columnId, value);
+        setData((old) => {
+          return old.map((row, index) => {
+            if (index === rowIndex) {
+              return {
+                ...row,
+                [columnId]: value,
+              };
+            }
+            return row;
+          });
+        });
       },
       saveRow: (rowIndex) => {
-        console.log("save row", rowIndex);
+        const oldRow = savedData ? savedData[rowIndex] : null;
+        const newRow = data[rowIndex];
+
+        if (toBudget === undefined) {
+          console.error("Budget balance could not be loaded");
+          return;
+        }
+
+        setEditingIndex(null);
+
+        if (newRow.id) {
+          newRow.local_id = localId;
+          setLocalId(localId + 1);
+        }
+
+        // const updated = [...data];
+        setSavedData([...data]);
+        upsertDistant(newRow);
+
+        // update local remaining budget amount
+        if (oldRow && newRow.budgeted !== oldRow.budgeted) {
+          const diff = oldRow.budgeted - newRow.budgeted;
+          setToBudget(toBudget + diff);
+        }
       },
       revertChanges: () => {
         console.log("revert changes");
@@ -66,13 +125,15 @@ const EnvelopeGrid = ({ columns, savedData }: EnvelopeGridProps) => {
             ...old,
             {
               id: undefined,
-              name: undefined,
+              budget_id: budget_id,
+              name: "",
               description: undefined,
               budgeted: 0,
               spent: 0,
             },
           ];
         });
+        setEditingIndex(data.length);
       },
       removeRow: () => {
         console.log("remove envelope");
@@ -85,25 +146,43 @@ const EnvelopeGrid = ({ columns, savedData }: EnvelopeGridProps) => {
 
   const remaining = (row: Row<Envelope>) =>
     row.getValue<number>("budgeted") - row.getValue<number>("spent");
+
   return (
     <div>
       <AddRowButton table={table} />
       <div className="flex flex-wrap">
         {table.getRowModel().rows.map((row) => (
-          <Card key={row.id} className="m-2 w-full lg:w-80 relative">
+          <Card key={row.index} className="m-2 w-full lg:w-80 relative">
             <div className="absolute right-0 m-4">
-              <EditMenu table={table} row={row} />
+              <EditMenu row={row} table={table} />
             </div>
-            <CardHeader>
-              <CardTitle>{row.getValue("name")}</CardTitle>
-              <CardDescription className="h-4">
-                {row.getValue("description")}
+            <CardHeader className="h-28">
+              <CardTitle>
+                <TextField
+                  row={row}
+                  table={table}
+                  columnId="name"
+                  className="text-2xl font-semibold leading-none tracking-tight p-1 w-2/3 h-8"
+                />
+              </CardTitle>
+              <CardDescription>
+                <TextField
+                  row={row}
+                  table={table}
+                  columnId="description"
+                  className="text-sm text-muted-foreground p-1 w-2/3 h-4"
+                />
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex gap-8">
+            <CardContent className="flex justify-between">
               <div className="text-right">
                 <div className="text-xs mb-1">Budgeted</div>
-                <div>{row.getValue<number>("budgeted").toFixed(2)}</div>
+                <NumberField
+                  row={row}
+                  table={table}
+                  columnId="budgeted"
+                  className="w-20 p-0 h-6 text-right"
+                />
               </div>
               <div className="text-right">
                 <div className="text-xs mb-1 ">Spent</div>

@@ -59,7 +59,7 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "envelope_id",
-    header: "category",
+    header: "Envelope",
     cell: EnvelopeCell,
     size: 100,
     meta: {

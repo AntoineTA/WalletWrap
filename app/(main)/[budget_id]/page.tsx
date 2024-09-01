@@ -11,7 +11,7 @@ const Budget = ({ params }: { params: { budget_id: number } }) => {
   const [toBudget, setToBudget] = useState<number | undefined>();
 
   useEffect(() => {
-    if (!(balance && envelopes)) return;
+    if (balance === undefined || !envelopes) return;
     console.log("balance", balance);
     console.log("envelopes", envelopes);
     const budgeted = envelopes
@@ -36,7 +36,14 @@ const Budget = ({ params }: { params: { budget_id: number } }) => {
           </div>
         )}
       </div>
-      {envelopes && <EnvelopeGrid columns={columns} savedData={envelopes} />}
+      {envelopes && (
+        <EnvelopeGrid
+          columns={columns}
+          budget_id={params.budget_id}
+          toBudget={toBudget}
+          setToBudget={setToBudget}
+        />
+      )}
     </div>
   );
 };

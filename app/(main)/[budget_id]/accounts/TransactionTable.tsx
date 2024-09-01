@@ -144,7 +144,7 @@ export function TransactionTable({
         const updated = [...data].sort((a, b) => {
           if (!b.date) return 1;
           if (!a.date) return -1;
-          return new Date(b.date).getDate() - new Date(a.date).getDate();
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
         });
 
         // update the data in the table and remotely
@@ -276,7 +276,6 @@ export function TransactionTable({
                             cell.column.columnDef.cell,
                             cell.getContext(),
                           )}
-                          {row.getValue("note")}
                         </TableCell>
                       ))}
                     </TableRow>

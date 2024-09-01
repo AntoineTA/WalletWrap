@@ -96,7 +96,7 @@ export const useTransactionTable = (budget_id: number) => {
     }
 
     // Update the data in the table with the new record
-    setUpserted({ db_id: data!.id, local_id });
+    setUpserted({ db_id: data.id, local_id });
   };
 
   const deleteDistant = async (ids: (number | undefined)[]) => {

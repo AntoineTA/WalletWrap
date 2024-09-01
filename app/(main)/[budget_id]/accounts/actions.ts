@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { Envelope } from "../hooks";
+import { Envelope } from "../EnvelopeGrid";
 
 export type InboundTransaction = {
   id: number | undefined;
@@ -226,4 +226,26 @@ export const getEnvelopesView = async (budget_id: number) => {
     };
 
   return { envelopes: data as Envelope[] };
+};
+
+export const upsertEnvelope = async (data: Envelope) => {
+  console.log("upsertEnvelope", data);
+  const supabase = createClient();
+
+  const { data: envelope, error } = await supabase
+    .from("envelopes")
+    .upsert(data, { onConflict: "id", ignoreDuplicates: false })
+    .select()
+    .single();
+
+  if (error)
+    return {
+      error: {
+        title: "Could not save envelope",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { envelope };
 };

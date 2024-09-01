@@ -51,10 +51,10 @@ export const EditMenu = ({ row, table }: EditMenuProps) => {
       {meta.editingIndex === row.index && (
         <Button
           onClick={() => meta.saveRow(row.index)}
-          className="p-0"
+          className="h-4 w-4"
           variant="ghost"
         >
-          <Check className="h-4 w-4" />
+          Save
         </Button>
       )}
     </div>
