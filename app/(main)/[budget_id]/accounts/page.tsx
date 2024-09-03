@@ -6,6 +6,7 @@ import {
   BalanceCard,
   SkeletonAccountInfoCard,
 } from "./TopCards";
+import { AddAccountButton } from "./AddAccountForm";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { columns } from "./columns";
 import { TransactionTable } from "./TransactionTable";
@@ -37,12 +38,9 @@ const Accounts = ({ params }: { params: { budget_id: number } }) => {
               <AccountInfoCard key={account.id} account={account} />
             ))
           ) : (
-            <>
-              <SkeletonAccountInfoCard />
-              <SkeletonAccountInfoCard />
-            </>
+            <SkeletonAccountInfoCard />
           )}
-          <div>Add account button</div>
+          <AddAccountButton budget_id={params.budget_id} />
         </div>
       </div>
       <TransactionTable

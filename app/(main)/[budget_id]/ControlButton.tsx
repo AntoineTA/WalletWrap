@@ -19,7 +19,7 @@ export const AddRowButton = ({ table, disabled }: ControlButtonsProps) => {
   return (
     <Button onClick={handleClick} variant="ghost" disabled={disabled}>
       <Plus className="mr-2 h-4 w-4" />
-      Add
+      Add Envelope
     </Button>
   );
 };

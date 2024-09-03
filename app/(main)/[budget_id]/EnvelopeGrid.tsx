@@ -176,6 +176,18 @@ const EnvelopeGrid = ({
           {editingIndex !== null ? <CancelButton table={table} /> : null}
         </div>
       )}
+      {table.getRowModel().rows?.length === 0 && (
+        <div className="flex justify-center text-slate-600 text-center my-12">
+          {savedData ? (
+            <div>
+              <div className="font-semibold">Nothing there yet!</div>
+              <div>Add an envelope to get started</div>
+            </div>
+          ) : (
+            <span>Loading...</span>
+          )}
+        </div>
+      )}
       <div className="flex flex-wrap">
         {table.getRowModel().rows.map((row) => (
           <Card key={row.index} className="m-2 w-full lg:w-80 relative">

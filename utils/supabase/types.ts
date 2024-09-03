@@ -16,7 +16,7 @@ export type Database = {
           id: number;
           name: string;
           starting_balance: number;
-          type: Database["public"]["Enums"]["account_types"];
+          type: string;
         };
         Insert: {
           budget_id: number;
@@ -24,7 +24,7 @@ export type Database = {
           id?: number;
           name: string;
           starting_balance?: number;
-          type?: Database["public"]["Enums"]["account_types"];
+          type?: string;
         };
         Update: {
           budget_id?: number;
@@ -32,11 +32,11 @@ export type Database = {
           id?: number;
           name?: string;
           starting_balance?: number;
-          type?: Database["public"]["Enums"]["account_types"];
+          type?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "Accounts_budget_fkey";
+            foreignKeyName: "accounts_budget_id_fkey";
             columns: ["budget_id"];
             isOneToOne: false;
             referencedRelation: "budgets";
@@ -203,11 +203,11 @@ export type Database = {
           id: number | null;
           name: string | null;
           starting_balance: number | null;
-          type: Database["public"]["Enums"]["account_types"] | null;
+          type: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: "Accounts_budget_fkey";
+            foreignKeyName: "accounts_budget_id_fkey";
             columns: ["budget_id"];
             isOneToOne: false;
             referencedRelation: "budgets";

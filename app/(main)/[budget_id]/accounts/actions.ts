@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { Envelope } from "../EnvelopeGrid";
+import { revalidatePath } from "next/cache";
 
 export type InboundTransaction = {
   id: number | undefined;
@@ -273,4 +274,31 @@ export const deleteEnvelope = async (id: number) => {
     };
 
   return { error: null };
+};
+
+export type InboundAccount = {
+  budget_id: number;
+  name: string;
+  type: string;
+  starting_balance: number;
+};
+
+export const insertAccount = async (data: InboundAccount) => {
+  const supabase = createClient();
+
+  const { data: account, error } = await supabase
+    .from("accounts")
+    .insert(data)
+    .single();
+
+  if (error)
+    return {
+      error: {
+        title: "Could not save account",
+        message: error.message,
+        code: error.code,
+      },
+    };
+
+  return { account };
 };

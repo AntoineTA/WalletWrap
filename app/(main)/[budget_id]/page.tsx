@@ -12,8 +12,6 @@ const Budget = ({ params }: { params: { budget_id: number } }) => {
 
   useEffect(() => {
     if (balance === undefined || !envelopes) return;
-    console.log("balance", balance);
-    console.log("envelopes", envelopes);
     const budgeted = envelopes
       .map((envelope) => envelope.budgeted)
       .reduce((acc, curr) => acc + curr, 0);

@@ -163,8 +163,9 @@ export const useTopCards = (budget_id: number) => {
   };
 
   useEffect(() => {
+    console.log("fetching accounts");
     getAccounts();
-  });
+  }, []);
 
   return { accounts, error };
 };
