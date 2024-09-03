@@ -1,4 +1,4 @@
-import { Envelope } from "./EnvelopeGrid";
+import { Envelope } from "@/hooks/useEnvelopes";
 import type { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2 } from "lucide-react";

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import type { Column, Row, Table } from "@tanstack/react-table";
-import type { Envelope } from "./EnvelopeGrid";
+import type { Row, Table } from "@tanstack/react-table";
+import type { Envelope } from "@/hooks/useEnvelopes";
 
 type InputCellsProps = {
   row: Row<Envelope>;
@@ -16,7 +16,7 @@ export const TextField = ({
   columnId,
   className,
 }: InputCellsProps) => {
-  const tableMeta = table.options.meta!;
+  const { editingIndex, updateCell } = table.options.meta!;
   const initialValue = row.getValue<string>(columnId);
   const [value, setValue] = useState(initialValue);
 
@@ -25,13 +25,13 @@ export const TextField = ({
   }, [initialValue]);
 
   // If the row is being edited, return the input field
-  if (tableMeta.editingIndex === row.index) {
+  if (editingIndex === row.index) {
     return (
       <Input
         className={className}
         value={value || ""}
         onChange={(event) => setValue(event.target.value)}
-        onBlur={() => tableMeta.updateCell(row.index, columnId, value)}
+        onBlur={() => updateCell(row.index, columnId, value)}
         type="text"
       />
     );
@@ -46,7 +46,7 @@ export const NumberField = ({
   columnId,
   className,
 }: InputCellsProps) => {
-  const tableMeta = table.options.meta!;
+  const { updateCell, editingIndex } = table.options.meta!;
   const initialValue = row.getValue<number>(columnId);
   const [value, setValue] = useState(initialValue);
 
@@ -55,13 +55,13 @@ export const NumberField = ({
   }, [initialValue]);
 
   // If the row is being edited, return the input field
-  if (tableMeta.editingIndex === row.index) {
+  if (editingIndex === row.index) {
     return (
       <Input
         className={className}
         value={value || ""}
         onChange={(event) => setValue(Number(event.target.value))}
-        onBlur={() => tableMeta.updateCell(row.index, columnId, value)}
+        onBlur={() => updateCell(row.index, columnId, value)}
         type="number"
       />
     );

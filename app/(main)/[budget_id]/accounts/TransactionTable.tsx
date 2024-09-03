@@ -38,19 +38,19 @@ export type SelectOptions =
       envelopes: { id: number; label: string }[];
     }
   | undefined;
-declare module "@tanstack/react-table" {
-  interface TableMeta<TData extends RowData> {
-    selectOptions?: SelectOptions;
-    editingIndex: number | null;
-    setEditingIndex: (index: number | null) => void;
-    updateCell: (rowIndex: number, columnId: string, value: any) => void;
-    saveRow: (rowIndex: number) => void;
-    revertChanges: () => void;
-    addRow: () => void;
-    removeRow: (rowIndex: number) => void;
-    removeRows: (rowIndices: number[]) => void;
-  }
-}
+// declare module "@tanstack/react-table" {
+//   interface TableMeta<TData extends RowData> {
+//     selectOptions?: SelectOptions;
+//     editingIndex: number | null;
+//     setEditingIndex: (index: number | null) => void;
+//     updateCell: (rowIndex: number, columnId: string, value: unknown) => void;
+//     saveRow: (rowIndex: number) => void;
+//     revertChanges: () => void;
+//     addRow: () => void;
+//     removeRow: (rowIndex: number) => void;
+//     removeRows: (rowIndices: number[]) => void;
+//   }
+// }
 
 type TransactionTableProps = {
   columns: ColumnDef<Transaction>[];

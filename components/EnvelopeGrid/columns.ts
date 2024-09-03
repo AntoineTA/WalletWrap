@@ -1,8 +1,5 @@
-"use client";
-
+import { Envelope } from "@/hooks/useEnvelopes";
 import type { ColumnDef } from "@tanstack/react-table";
-import type { Envelope } from "./EnvelopeGrid";
-import { EditMenu } from "./EditMenu";
 
 export const columns: ColumnDef<Envelope>[] = [
   {
