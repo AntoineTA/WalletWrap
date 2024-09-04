@@ -12,7 +12,9 @@ import { useAccounts } from "@/hooks/useAccounts";
 import { TransactionTable } from "@/components/TransactionTable/TransactionTable";
 
 const Accounts = ({ params }: { params: { budget_id: number } }) => {
-  const { accounts, balance, error, isPending } = useAccounts(params.budget_id);
+  const { accounts, balance, error, isPending, setAccounts } = useAccounts(
+    params.budget_id,
+  );
 
   return (
     <div className="container mx-auto my-8">
@@ -28,7 +30,13 @@ const Accounts = ({ params }: { params: { budget_id: number } }) => {
           ))}
         <AddAccountButton budget_id={params.budget_id} />
       </div>
-      <TransactionTable budget_id={params.budget_id} balance={balance} />
+      {accounts && (
+        <TransactionTable
+          budget_id={params.budget_id}
+          accounts={accounts}
+          setAccounts={setAccounts}
+        />
+      )}
     </div>
     // <div className="container mx-auto my-8">
     //   <div className="my-8">

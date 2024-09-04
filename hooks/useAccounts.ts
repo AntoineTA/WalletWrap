@@ -17,6 +17,7 @@ export const useAccounts = (budget_id: number) => {
   const [accounts, setAccounts] = useState<Account[] | undefined>();
   const [balance, setBalance] = useState<number | undefined>();
 
+  // get accounts
   useEffect(() => {
     (async () => {
       setError(null);
@@ -39,13 +40,19 @@ export const useAccounts = (budget_id: number) => {
         return;
       }
       setAccounts(data);
-
-      const balance = data
-        .map((account) => account.balance)
-        .reduce((acc, curr) => acc + curr, 0);
-      setBalance(balance);
     })();
   }, [budget_id]);
 
-  return { accounts, balance, error, isPending };
+  // get balance
+  useEffect(() => {
+    if (!accounts) return;
+
+    const balance = accounts.reduce((acc, account) => {
+      return acc + account.balance;
+    }, 0);
+
+    setBalance(balance);
+  }, [accounts]);
+
+  return { accounts, balance, error, isPending, setAccounts };
 };

@@ -4,8 +4,8 @@ declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
     selectOptions?: { [key: string]: { id: number; label: string }[] };
     editingIndex: number | null;
-    setEditingIndex: (index: number | null) => void;
     addRow: () => void;
+    editRow: (rowIndex: number) => void;
     updateCell: (
       rowIndex: number,
       columnId: string,

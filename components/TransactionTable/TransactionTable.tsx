@@ -19,31 +19,36 @@ import { AddRowButton, CancelButton, RemoveRowsButton } from "./ControlButtons";
 import { useTransactionTable } from "@/hooks/useTransactionTable";
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { columns } from "./columns";
+import type { Account } from "@/hooks/useAccounts";
 
 type TransactionTableProps = {
   budget_id: number;
-  balance: number | undefined;
+  accounts: Account[];
+  setAccounts: (accounts: Account[]) => void;
+  // balance: number | undefined;
   // setBalance: (balance: number) => void;
 };
 
 export function TransactionTable({
   budget_id,
-  balance,
+  accounts,
+  setAccounts,
+  // balance,
   // setBalance,
 }: TransactionTableProps) {
   const {
     data,
     saved,
     selectOptions,
-    createRow,
+    editingIndex,
+    editRow,
+    addRow,
     updateCell,
-    loadSaved,
+    revertChanges,
     saveRow,
     isPending,
     error,
-  } = useTransactionTable(budget_id);
-
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  } = useTransactionTable(budget_id, accounts, setAccounts);
 
   const table = useReactTable({
     columns,
@@ -52,24 +57,13 @@ export function TransactionTable({
     enableRowSelection: true,
     state: {},
     meta: {
-      editingIndex,
-      setEditingIndex,
       selectOptions,
-      addRow: () => {
-        createRow();
-        setEditingIndex(0);
-      },
-      updateCell: (rowIndex, columnId, value) => {
-        updateCell(rowIndex, columnId, value);
-      },
-      revertChanges: () => {
-        loadSaved();
-        setEditingIndex(null);
-      },
-      saveRow: (rowIndex) => {
-        saveRow(rowIndex);
-        setEditingIndex(null);
-      },
+      editingIndex,
+      addRow,
+      editRow,
+      updateCell,
+      revertChanges,
+      saveRow,
       removeRow: (rowIndex) => {},
       removeRows: (rowsIndices) => {},
     },
@@ -82,7 +76,7 @@ export function TransactionTable({
         <div>
           <div className="flex items-center py-4">
             <AddRowButton table={table} disabled={isPending} />
-            {editingIndex !== null ? <CancelButton table={table} /> : null}
+            {/* {editingIndex !== null ? <CancelButton table={table} /> : null} */}
             {table.getSelectedRowModel().rows.length > 0 ? (
               <RemoveRowsButton table={table} />
             ) : null}

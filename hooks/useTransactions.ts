@@ -59,8 +59,6 @@ export const useTransactions = (budget_id: number) => {
       return;
     }
 
-    console.log(transaction);
-
     const { local_id, ...inbound } = transaction;
 
     const { data: upserted, error } = await supabase
@@ -69,18 +67,9 @@ export const useTransactions = (budget_id: number) => {
       .select()
       .single();
 
-    if (error) {
-      setError({
-        title: "We could not save the transaction",
-        message: error.message,
-        code: error.code,
-      });
-      return;
-    }
+    if (!upserted) throw error;
 
     return upserted;
-    // update the local state with the new record
-    // setTransactions((old) => [...old, { ...data, local_id }]);
   };
 
   return { transactions, upsertTransaction, error, isPending };

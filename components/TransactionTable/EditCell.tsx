@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Table, Row } from "@tanstack/react-table";
-import type { Transaction } from "./TransactionTable";
+import type { Transaction } from "@/hooks/useTransactions";
 
 type EditCellProps = {
   row: Row<Transaction>;
@@ -28,12 +28,7 @@ const EditCell = ({ row, table }: EditCellProps) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => {
-                meta.revertChanges();
-                meta.setEditingIndex(row.index);
-              }}
-            >
+            <DropdownMenuItem onClick={() => meta.editRow(row.index)}>
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
