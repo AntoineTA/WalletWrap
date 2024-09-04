@@ -1,7 +1,4 @@
-import { useState } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -9,8 +6,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Card } from "@/components/ui/card";
-import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,17 +23,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { cn } from "@/lib/utils";
-import { insertAccount } from "./actions";
-import { ErrorAlert, type Error } from "@/components/ui/error-alert";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { useRouter } from "next/navigation";
-
-const formSchema = z.object({
-  name: z.string(),
-  type: z.string(),
-  starting_balance: z.coerce.number(),
-});
+import { ErrorAlert } from "@/components/ErrorAlert";
+import { useAccountForm } from "@/hooks/useAccountForm";
 
 type AddAccountFormProps = {
   open: boolean;
@@ -46,70 +33,12 @@ type AddAccountFormProps = {
   budget_id: number;
 };
 
-export const AddAccountButton = ({ budget_id }: { budget_id: number }) => {
-  const [isAdding, setIsAdding] = useState(false);
-
-  return (
-    <div className="w-52">
-      <Card
-        onClick={() => setIsAdding(true)}
-        className="flex justify-center items-center text-slate-600 h-24 border-dashed hover:shadow-lg hover:border-solid hover:text-black cursor-pointer"
-      >
-        <span className="flex gap-2">
-          <Plus size={24} />
-          New Account
-        </span>
-      </Card>
-      <AddAccountForm
-        open={isAdding}
-        setOpen={setIsAdding}
-        budget_id={budget_id}
-      />
-    </div>
-  );
-};
-
 export const AddAccountForm = ({
   open,
   setOpen,
   budget_id,
 }: AddAccountFormProps) => {
-  const [isPending, setPending] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const router = useRouter();
-
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      type: "checking",
-      starting_balance: 0,
-    },
-    mode: "onTouched",
-  });
-
-  const addAccount = async (values: z.infer<typeof formSchema>) => {
-    setPending(true);
-    setError(null);
-
-    const newAccount = { ...values, budget_id: budget_id };
-
-    const { error } = await insertAccount(newAccount);
-
-    setPending(false);
-
-    if (error) {
-      setError({
-        title: "We could not add the account.",
-        message: error.message,
-        code: error.code,
-      });
-    }
-    if (!error) {
-      setOpen(false);
-      location.reload();
-    }
-  };
+  const { error, isPending, form, createAccount } = useAccountForm(budget_id);
 
   return (
     <Dialog open={open} onOpenChange={() => setOpen(false)}>
@@ -119,7 +48,7 @@ export const AddAccountForm = ({
         </DialogHeader>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(addAccount)}
+            onSubmit={form.handleSubmit(createAccount)}
             aria-label="add account form"
             className="space-y-2"
           >
