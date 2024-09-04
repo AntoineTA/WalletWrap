@@ -2,6 +2,7 @@ import { RowData } from "@tanstack/react-table";
 
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
+    selectOptions?: { [key: string]: { id: number; label: string }[] };
     editingIndex: number | null;
     setEditingIndex: (index: number | null) => void;
     addRow: () => void;

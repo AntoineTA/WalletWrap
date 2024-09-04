@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { ErrorAlert, Error } from "@/components/ui/error-alert";
+import { ErrorAlert, Error } from "@/components/ErrorAlert";
 
 import { createClient } from "@/utils/supabase/client";
 

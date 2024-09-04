@@ -47,5 +47,5 @@ export const useAccounts = (budget_id: number) => {
     })();
   }, [budget_id]);
 
-  return { error, isPending, accounts, balance };
+  return { accounts, balance, error, isPending };
 };

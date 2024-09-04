@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
-  ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
-  type RowData,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -18,39 +16,32 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { AddRowButton, CancelButton, RemoveRowsButton } from "./ControlButtons";
-import { useTransactions } from "@/hooks/useTransactions";
 import { useTransactionTable } from "@/hooks/useTransactionTable";
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { columns } from "./columns";
-import { useEnvelopes } from "@/hooks/useEnvelopes";
-import { useAccounts } from "@/hooks/useAccounts";
-
-export type SelectOptions =
-  | {
-      accounts: { id: number; label: string }[];
-      envelopes: { id: number; label: string }[];
-    }
-  | undefined;
 
 type TransactionTableProps = {
   budget_id: number;
   balance: number | undefined;
-  setBalance: (balance: number) => void;
+  // setBalance: (balance: number) => void;
 };
 
 export function TransactionTable({
   budget_id,
   balance,
-  setBalance,
+  // setBalance,
 }: TransactionTableProps) {
-  const { transactions, isPending, error } = useTransactions(budget_id);
-  const { envelopes } = useEnvelopes(budget_id);
-  const { accounts } = useAccounts(budget_id);
-  const { data, saved } = useTransactionTable(
-    transactions,
-    envelopes,
-    accounts,
-  );
+  const {
+    data,
+    saved,
+    selectOptions,
+    createRow,
+    updateCell,
+    loadSaved,
+    saveRow,
+    isPending,
+    error,
+  } = useTransactionTable(budget_id);
 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
@@ -64,10 +55,21 @@ export function TransactionTable({
       editingIndex,
       setEditingIndex,
       selectOptions,
-      addRow: () => {},
-      updateCell: (rowIndex, columnId, value) => {},
-      revertChanges: () => {},
-      saveRow: (rowIndex) => {},
+      addRow: () => {
+        createRow();
+        setEditingIndex(0);
+      },
+      updateCell: (rowIndex, columnId, value) => {
+        updateCell(rowIndex, columnId, value);
+      },
+      revertChanges: () => {
+        loadSaved();
+        setEditingIndex(null);
+      },
+      saveRow: (rowIndex) => {
+        saveRow(rowIndex);
+        setEditingIndex(null);
+      },
       removeRow: (rowIndex) => {},
       removeRows: (rowsIndices) => {},
     },
@@ -79,10 +81,7 @@ export function TransactionTable({
       {!error && (
         <div>
           <div className="flex items-center py-4">
-            <AddRowButton
-              table={table}
-              disabled={!(savedData && selectOptions)}
-            />
+            <AddRowButton table={table} disabled={isPending} />
             {editingIndex !== null ? <CancelButton table={table} /> : null}
             {table.getSelectedRowModel().rows.length > 0 ? (
               <RemoveRowsButton table={table} />
@@ -136,7 +135,7 @@ export function TransactionTable({
                       colSpan={columns.length}
                       className="h-12 text-center"
                     >
-                      {!(savedData && selectOptions) ? (
+                      {isPending ? (
                         <span>Loading...</span>
                       ) : (
                         <span>No transactions found</span>

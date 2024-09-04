@@ -6,12 +6,10 @@ import {
   AddAccountButton,
   SkeletonCard,
 } from "@/components/AccountCards";
-// import { AddAccountButton } from "./AddAccountForm";
 import { ErrorAlert } from "@/components/ErrorAlert";
-import { columns } from "../../../../components/TransactionTable/columns";
-import { TransactionTable } from "../../../../components/TransactionTable/TransactionTable";
 import { Equal } from "lucide-react";
 import { useAccounts } from "@/hooks/useAccounts";
+import { TransactionTable } from "@/components/TransactionTable/TransactionTable";
 
 const Accounts = ({ params }: { params: { budget_id: number } }) => {
   const { accounts, balance, error, isPending } = useAccounts(params.budget_id);
@@ -30,6 +28,7 @@ const Accounts = ({ params }: { params: { budget_id: number } }) => {
           ))}
         <AddAccountButton budget_id={params.budget_id} />
       </div>
+      <TransactionTable budget_id={params.budget_id} balance={balance} />
     </div>
     // <div className="container mx-auto my-8">
     //   <div className="my-8">

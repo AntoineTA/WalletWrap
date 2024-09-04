@@ -25,7 +25,7 @@ export const useTransactions = (budget_id: number) => {
 
       const supabase = createClient();
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("accounts")
         .select("id, transactions (*)")
         .eq("budget_id", budget_id);
@@ -33,6 +33,7 @@ export const useTransactions = (budget_id: number) => {
       setIsPending(false);
 
       if (!data) {
+        console.error(error);
         setError({
           title: "We could not load your transactions",
           message: "Please try again later",
@@ -47,5 +48,40 @@ export const useTransactions = (budget_id: number) => {
     })();
   }, [budget_id]);
 
-  return { error, isPending, transactions };
+  const upsertTransaction = async (transaction: Transaction) => {
+    const supabase = createClient();
+
+    if (!transaction.account_id) {
+      setError({
+        title: "We could not save the transaction",
+        message: "Account ID is required",
+      });
+      return;
+    }
+
+    console.log(transaction);
+
+    const { local_id, ...inbound } = transaction;
+
+    const { data: upserted, error } = await supabase
+      .from("transactions")
+      .upsert(inbound, { onConflict: "id", ignoreDuplicates: false })
+      .select()
+      .single();
+
+    if (error) {
+      setError({
+        title: "We could not save the transaction",
+        message: error.message,
+        code: error.code,
+      });
+      return;
+    }
+
+    return upserted;
+    // update the local state with the new record
+    // setTransactions((old) => [...old, { ...data, local_id }]);
+  };
+
+  return { transactions, upsertTransaction, error, isPending };
 };

@@ -5,7 +5,7 @@ import { HeaderCheckboxCell, CheckboxCell } from "./CheckboxCells";
 import { TableCell, DateCell, AmountCell } from "./InputCells";
 import { AccountCell, EnvelopeCell } from "./SelectCells";
 import { EditCell } from "./EditCell";
-import type { Transaction } from "./TransactionTable";
+import { Transaction } from "@/hooks/useTransactions";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -39,10 +39,6 @@ export const columns: ColumnDef<Transaction>[] = [
     cell: AccountCell,
     size: 100,
     meta: {
-      filter: {
-        enabled: true,
-        name: "Accounts",
-      },
       type: "select",
     },
   },
@@ -51,10 +47,7 @@ export const columns: ColumnDef<Transaction>[] = [
     cell: TableCell,
     size: 200,
     meta: {
-      filter: {
-        enabled: true,
-        name: "Notes",
-      },
+      type: "text",
     },
   },
   {
@@ -63,10 +56,6 @@ export const columns: ColumnDef<Transaction>[] = [
     cell: EnvelopeCell,
     size: 100,
     meta: {
-      filter: {
-        enabled: true,
-        name: "Envelopes",
-      },
       type: "select",
     },
   },

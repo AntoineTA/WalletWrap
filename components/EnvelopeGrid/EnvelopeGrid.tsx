@@ -54,6 +54,10 @@ export const EnvelopeGrid = ({
       updateCell: (rowIndex, columnId, value) => {
         updateField(rowIndex, columnId, value);
       },
+      revertChanges: () => {
+        loadSaved();
+        setEditingIndex(null);
+      },
       saveRow: (rowIndex) => {
         const oldCard = saved[rowIndex] ?? null;
         const newCard = data[rowIndex];
@@ -68,10 +72,6 @@ export const EnvelopeGrid = ({
           setBudgetBalance(budgetBalance - diff);
         }
 
-        setEditingIndex(null);
-      },
-      revertChanges: () => {
-        loadSaved();
         setEditingIndex(null);
       },
       removeRow: (rowIndex) => {

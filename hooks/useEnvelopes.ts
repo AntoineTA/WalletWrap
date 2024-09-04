@@ -64,8 +64,11 @@ export const useEnvelopes = (budget_id: number) => {
       return;
     }
 
-    // update the local state with the new record
-    setEnvelopes((old) => [...old, { ...data, spent, local_id }]);
+    // If the envelope was new
+    if (!envelope.id) {
+      // update the local state with the new record
+      setEnvelopes((old) => [...old, { ...data, spent, local_id }]);
+    }
   };
 
   const deleteEnvelope = async (id: number) => {

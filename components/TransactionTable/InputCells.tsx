@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import type { Column, Row, Table } from "@tanstack/react-table";
-import { Transaction } from "./TransactionTable";
+import { Transaction } from "@/hooks/useTransactions";
 
 export type Formatter = (value?: number | string) => any;
 export type TableCellProps = {
