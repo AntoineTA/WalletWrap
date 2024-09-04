@@ -8,8 +8,8 @@ import {
 } from "@/components/AccountCards";
 // import { AddAccountButton } from "./AddAccountForm";
 import { ErrorAlert } from "@/components/ErrorAlert";
-import { columns } from "./columns";
-import { TransactionTable } from "./TransactionTable";
+import { columns } from "../../../../components/TransactionTable/columns";
+import { TransactionTable } from "../../../../components/TransactionTable/TransactionTable";
 import { Equal } from "lucide-react";
 import { useAccounts } from "@/hooks/useAccounts";
 

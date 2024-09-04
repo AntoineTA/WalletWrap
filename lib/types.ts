@@ -15,4 +15,8 @@ declare module "@tanstack/react-table" {
     removeRow: (rowIndex: number) => void;
     removeRows?: (rowIndices: number[]) => void;
   }
+
+  interface ColumnMeta<TData extends RowData, TValue> {
+    type?: string;
+  }
 }

@@ -9,10 +9,10 @@ import {
   getEnvelopesView,
   getEnvelopes,
 } from "./actions";
-import type { Transaction } from "./TransactionTable";
+import type { Transaction } from "../../../../components/TransactionTable/TransactionTable";
 import type { InboundTransaction } from "./actions";
 import type { Error } from "@/components/ui/error-alert";
-import type { SelectOptions } from "./TransactionTable";
+import type { SelectOptions } from "../../../../components/TransactionTable/TransactionTable";
 
 export type Account = {
   id: number;
