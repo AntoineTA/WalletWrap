@@ -24,11 +24,19 @@ export type Database = MergeDeep<
         budgets_view: {
           Row: {
             balance: number;
-            created_at: string;
-            description: string;
             id: number;
             name: string;
             user_id: string;
+          };
+        };
+        accounts_view: {
+          Row: {
+            balance: number;
+            budget_id: number;
+            id: number;
+            name: string;
+            starting_balance: number;
+            type: string;
           };
         };
       };

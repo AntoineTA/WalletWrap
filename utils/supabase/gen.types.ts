@@ -12,7 +12,6 @@ export type Database = {
       accounts: {
         Row: {
           budget_id: number;
-          created_at: string;
           id: number;
           name: string;
           starting_balance: number;
@@ -20,7 +19,6 @@ export type Database = {
         };
         Insert: {
           budget_id: number;
-          created_at?: string;
           id?: number;
           name: string;
           starting_balance?: number;
@@ -28,7 +26,6 @@ export type Database = {
         };
         Update: {
           budget_id?: number;
-          created_at?: string;
           id?: number;
           name?: string;
           starting_balance?: number;
@@ -53,22 +50,16 @@ export type Database = {
       };
       budgets: {
         Row: {
-          created_at: string;
-          description: string;
           id: number;
           name: string;
           user_id: string;
         };
         Insert: {
-          created_at?: string;
-          description: string;
           id?: number;
           name: string;
           user_id: string;
         };
         Update: {
-          created_at?: string;
-          description?: string;
           id?: number;
           name?: string;
           user_id?: string;
@@ -178,20 +169,6 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "Transactions_account_fkey";
-            columns: ["account_id"];
-            isOneToOne: false;
-            referencedRelation: "accounts";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "Transactions_account_fkey";
-            columns: ["account_id"];
-            isOneToOne: false;
-            referencedRelation: "accounts_view";
-            referencedColumns: ["id"];
-          },
-          {
             foreignKeyName: "transactions_envelope_id_fkey";
             columns: ["envelope_id"];
             isOneToOne: false;
@@ -213,7 +190,6 @@ export type Database = {
         Row: {
           balance: number | null;
           budget_id: number | null;
-          created_at: string | null;
           id: number | null;
           name: string | null;
           starting_balance: number | null;
@@ -239,8 +215,6 @@ export type Database = {
       budgets_view: {
         Row: {
           balance: number | null;
-          created_at: string | null;
-          description: string | null;
           id: number | null;
           name: string | null;
           user_id: string | null;

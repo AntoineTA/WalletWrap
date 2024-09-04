@@ -2,14 +2,12 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import type { Error } from "@/components/ErrorAlert";
 
-export const useBudgetBalance = (budget_id?: number) => {
+export const useBudgetBalance = (budget_id: number) => {
   const [error, setError] = useState<Error | null>();
   const [isPending, setIsPending] = useState(true);
   const [budgetBalance, setBudgetBalance] = useState<number | undefined>();
 
   useEffect(() => {
-    if (!budget_id) return;
-
     (async () => {
       setError(null);
       setIsPending(true);
@@ -34,7 +32,7 @@ export const useBudgetBalance = (budget_id?: number) => {
 
       setBudgetBalance(data.balance);
     })();
-  }, []);
+  }, [budget_id]);
 
   return { error, isPending, budgetBalance, setBudgetBalance };
 };

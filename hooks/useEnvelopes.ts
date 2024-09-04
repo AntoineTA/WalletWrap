@@ -41,7 +41,7 @@ export const useEnvelopes = (budget_id: number) => {
 
       setEnvelopes(data);
     })();
-  }, []);
+  }, [budget_id]);
 
   const saveEnvelope = async (envelope: Envelope) => {
     const supabase = createClient();
