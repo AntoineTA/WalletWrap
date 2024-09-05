@@ -31,12 +31,7 @@ const EditCell = ({ row, table }: EditCellProps) => {
             <DropdownMenuItem onClick={() => meta.editRow(row.index)}>
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                meta.revertChanges();
-                meta.removeRow(row.index);
-              }}
-            >
+            <DropdownMenuItem onClick={() => meta.removeRow(row.index)}>
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

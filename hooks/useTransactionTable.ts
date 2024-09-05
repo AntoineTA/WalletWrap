@@ -15,8 +15,13 @@ export const useTransactionTable = (
   accounts: Account[],
   setAccounts: (accounts: Account[]) => void,
 ) => {
-  const { transactions, upsertTransaction, ...transactionsStatus } =
-    useTransactions(budget_id);
+  const {
+    transactions,
+    upsertTransaction,
+    deleteTransaction,
+    deleteTransactions,
+    ...transactionsStatus
+  } = useTransactions(budget_id);
   const { envelopes, ...envelopesStatus } = useEnvelopes(budget_id);
   const { ...accountsStatus } = useAccounts(budget_id);
 
@@ -29,7 +34,6 @@ export const useTransactionTable = (
 
   //Get table data
   useEffect(() => {
-    console.log("transactions", transactions);
     setSaved(transactions);
     setData(transactions);
   }, [transactions]);
@@ -143,14 +147,7 @@ export const useTransactionTable = (
       .then((upserted) => {
         // if the upserted row was new, we update the id with the one from the db
         if (newRow.id === undefined && upserted) {
-          setSaved((rows) => {
-            return rows.map((row) => {
-              if (row.local_id === newRow.local_id) {
-                return { ...row, id: upserted.id };
-              }
-              return row;
-            });
-          });
+          updateId(newRow, upserted.id);
         }
       })
       .catch((error) => {
@@ -183,6 +180,79 @@ export const useTransactionTable = (
     setEditingIndex(null);
   };
 
+  const removeRow = (rowIndex: number) => {
+    const removedRow = data[rowIndex];
+
+    // remove locally
+    setData((rows) => {
+      return rows.filter((_, index) => index !== rowIndex);
+    });
+    setSaved(data);
+
+    // remove from db
+    if (!removedRow.id) return; // if the row was never saved to db, we don't need to delete it
+    deleteTransaction(removedRow.id);
+
+    // update local account balance
+    const diff = (removedRow.inflow || 0) - (removedRow.outflow || 0);
+    const updatedAccounts = accounts.map((account) => {
+      if (account.id === removedRow.account_id) {
+        return { ...account, balance: account.balance - diff };
+      }
+      return account;
+    });
+    setAccounts(updatedAccounts);
+  };
+
+  const removeRows = (rowsIndices: number[]) => {
+    const removedRows = rowsIndices.map((index) => data[index]);
+
+    // remove locally
+    setData((rows) => {
+      return rows.filter((_, i) => !rowsIndices.includes(i));
+    });
+    setSaved(data);
+
+    // remove from db
+    const removedIds = removedRows
+      .map((row) => row.id)
+      .filter((id) => id !== undefined);
+    if (removedIds.length > 0) {
+      deleteTransactions(removedIds);
+    }
+
+    // update local account balance
+    const diff = removedRows.reduce((acc, row) => {
+      return acc + ((row.inflow || 0) - (row.outflow || 0));
+    }, 0);
+    const updatedAccounts = accounts.map((account) => {
+      if (removedRows.some((row) => row.account_id === account.id)) {
+        return { ...account, balance: account.balance - diff };
+      }
+      return account;
+    });
+    setAccounts(updatedAccounts);
+  };
+
+  const updateId = (rowToUpdate: Transaction, updatedId: number) => {
+    setData((rows) => {
+      return rows.map((row) => {
+        if (row.local_id === rowToUpdate.local_id) {
+          return { ...row, id: updatedId };
+        }
+        return row;
+      });
+    });
+    setSaved((rows) => {
+      return rows.map((row) => {
+        if (row.local_id === rowToUpdate.local_id) {
+          return { ...row, id: updatedId };
+        }
+        return row;
+      });
+    });
+  };
+
   return {
     data,
     saved,
@@ -193,6 +263,8 @@ export const useTransactionTable = (
     updateCell,
     revertChanges,
     saveRow,
+    removeRow,
+    removeRows,
     isPending,
     error,
   };

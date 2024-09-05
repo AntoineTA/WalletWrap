@@ -1,5 +1,3 @@
-import type { Column, Row, Table } from "@tanstack/react-table";
-import { Transaction } from "./TransactionTable";
 import {
   Select,
   SelectContent,
@@ -7,6 +5,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Column, Row, Table } from "@tanstack/react-table";
+import type { Transaction } from "@/hooks/useTransactions";
 
 export type SelectCellProps = {
   getValue: () => any;

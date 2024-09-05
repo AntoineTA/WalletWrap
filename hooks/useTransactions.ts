@@ -18,6 +18,7 @@ export const useTransactions = (budget_id: number) => {
   const [isPending, setIsPending] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
+  // Fetch transactions
   useEffect(() => {
     (async () => {
       setError(null);
@@ -72,5 +73,45 @@ export const useTransactions = (budget_id: number) => {
     return upserted;
   };
 
-  return { transactions, upsertTransaction, error, isPending };
+  const deleteTransaction = async (id: number) => {
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from("transactions")
+      .delete()
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      setError({
+        title: "We could not delete the transaction",
+        message: "Please try again later",
+      });
+    }
+  };
+
+  const deleteTransactions = async (ids: number[]) => {
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from("transactions")
+      .delete()
+      .in("id", ids);
+
+    if (error) {
+      setError({
+        title: "We could not delete the transactions",
+        message: "Please try again later",
+      });
+    }
+  };
+
+  return {
+    transactions,
+    upsertTransaction,
+    deleteTransaction,
+    deleteTransactions,
+    error,
+    isPending,
+  };
 };

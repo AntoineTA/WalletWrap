@@ -1,21 +1,9 @@
-"use client";
-
-import { type ColumnDef, type RowData } from "@tanstack/react-table";
 import { HeaderCheckboxCell, CheckboxCell } from "./CheckboxCells";
 import { TableCell, DateCell, AmountCell } from "./InputCells";
 import { AccountCell, EnvelopeCell } from "./SelectCells";
 import { EditCell } from "./EditCell";
-import { Transaction } from "@/hooks/useTransactions";
-
-declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
-    filter?: {
-      enabled: boolean;
-      name: string;
-    };
-    type?: string;
-  }
-}
+import type { ColumnDef } from "@tanstack/react-table";
+import type { Transaction } from "@/hooks/useTransactions";
 
 export const columns: ColumnDef<Transaction>[] = [
   {

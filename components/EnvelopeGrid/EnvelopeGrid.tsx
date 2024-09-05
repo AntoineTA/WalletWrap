@@ -45,8 +45,6 @@ export const EnvelopeGrid = ({
     getCoreRowModel: getCoreRowModel(),
     meta: {
       editingIndex,
-      setEditingIndex,
-
       addRow: () => {
         createCard(budget_id);
         setEditingIndex(data.length);
