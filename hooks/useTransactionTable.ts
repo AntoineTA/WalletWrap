@@ -10,7 +10,7 @@ export type SelectOptions = {
   envelopes: { id: number; label: string }[];
 };
 
-export const useTransactionTable = (budget_id: number) => {
+export const useTransactionTable = () => {
   const {
     accounts,
     setAccounts,
@@ -24,12 +24,12 @@ export const useTransactionTable = (budget_id: number) => {
     deleteTransactions,
     isPending: transactionsIsPending,
     error: transactionsError,
-  } = useTransactions(budget_id);
+  } = useTransactions();
   const {
     envelopes,
     isPending: envelopesIsPending,
     error: envelopesError,
-  } = useEnvelopes(budget_id);
+  } = useEnvelopes();
 
   const [saved, setSaved] = useState<Transaction[]>([]);
   const [data, setData] = useState<Transaction[]>([]);

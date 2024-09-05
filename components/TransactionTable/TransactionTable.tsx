@@ -23,7 +23,7 @@ import { useTransactionTable } from "@/hooks/useTransactionTable";
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { columns } from "./columns";
 
-export function TransactionTable({ budget_id }: { budget_id: number }) {
+export function TransactionTable() {
   const {
     data,
     selectOptions,
@@ -37,7 +37,7 @@ export function TransactionTable({ budget_id }: { budget_id: number }) {
     removeRows,
     isPending,
     error,
-  } = useTransactionTable(budget_id);
+  } = useTransactionTable();
 
   const table = useReactTable({
     columns,

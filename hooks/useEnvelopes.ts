@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { useSession } from "@/hooks/useSession";
 import type { Error } from "@/components/ErrorAlert";
 
 export type Envelope = {
   id: number | undefined;
-  budget_id: number;
   name: string;
   description: string | null;
   budgeted: number;
@@ -12,7 +12,10 @@ export type Envelope = {
   local_id?: number;
 };
 
-export const useEnvelopes = (budget_id: number) => {
+export const useEnvelopes = () => {
+  const supabase = createClient();
+  const { getBudgetId } = useSession();
+
   const [error, setError] = useState<Error | null>();
   const [isPending, setIsPending] = useState(true);
   const [envelopes, setEnvelopes] = useState<Envelope[]>([]);
@@ -22,7 +25,7 @@ export const useEnvelopes = (budget_id: number) => {
       setError(null);
       setIsPending(true);
 
-      const supabase = createClient();
+      const budget_id = await getBudgetId();
 
       const { data } = await supabase
         .from("envelopes_view")
@@ -41,16 +44,19 @@ export const useEnvelopes = (budget_id: number) => {
 
       setEnvelopes(data);
     })();
-  }, [budget_id]);
+  }, []);
 
   const upsertEnvelope = async (envelope: Envelope) => {
-    const supabase = createClient();
-
     const { local_id, spent, ...inbound } = envelope;
+
+    const budget_id = await getBudgetId();
 
     const { data: upserted, error } = await supabase
       .from("envelopes")
-      .upsert(inbound, { onConflict: "id", ignoreDuplicates: false })
+      .upsert(
+        { ...inbound, budget_id },
+        { onConflict: "id", ignoreDuplicates: false },
+      )
       .select()
       .single();
 
@@ -60,8 +66,6 @@ export const useEnvelopes = (budget_id: number) => {
   };
 
   const deleteEnvelope = async (id: number) => {
-    const supabase = createClient();
-
     const { error } = await supabase.from("envelopes").delete().eq("id", id);
 
     if (error) {

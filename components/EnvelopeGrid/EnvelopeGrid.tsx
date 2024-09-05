@@ -21,7 +21,7 @@ import { EditMenu } from "./EditMenu";
 import { NumberField, TextField } from "./InputCells";
 import { columns } from "./columns";
 
-export const EnvelopeGrid = ({ budget_id }: { budget_id: number }) => {
+export const EnvelopeGrid = () => {
   const {
     data,
     editingIndex,
@@ -33,7 +33,7 @@ export const EnvelopeGrid = ({ budget_id }: { budget_id: number }) => {
     removeRow,
     isPending,
     error,
-  } = useEnvelopeGrid(budget_id);
+  } = useEnvelopeGrid();
 
   const table = useReactTable({
     columns,

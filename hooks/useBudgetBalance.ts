@@ -1,23 +1,26 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { useSession } from "@/hooks/useSession";
 import type { Error } from "@/components/ErrorAlert";
 
-export const useBudgetBalance = (budget_id: number) => {
+export const useBudgetBalance = () => {
+  const { getUserId } = useSession();
   const [error, setError] = useState<Error | null>(null);
   const [isPending, setIsPending] = useState(true);
   const [budgetBalance, setBudgetBalance] = useState<number | undefined>();
 
+  const supabase = createClient();
   useEffect(() => {
     (async () => {
       setError(null);
       setIsPending(true);
 
-      const supabase = createClient();
+      const user_id = await getUserId();
 
       const { data } = await supabase
         .from("budgets_view")
         .select("balance")
-        .eq("id", budget_id)
+        .eq("user_id", user_id)
         .single();
 
       setIsPending(false);
@@ -32,7 +35,7 @@ export const useBudgetBalance = (budget_id: number) => {
 
       setBudgetBalance(data.balance);
     })();
-  }, [budget_id]);
+  }, []);
 
   return { error, isPending, budgetBalance, setBudgetBalance };
 };

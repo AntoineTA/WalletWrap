@@ -14,17 +14,17 @@ import {
   useAccountsContext,
 } from "@/contexts/AccountsContext";
 
-const AccountsPage = ({ params }: { params: { budget_id: number } }) => {
+const Accounts = () => {
   return (
-    <AccountsProvider budget_id={params.budget_id}>
+    <AccountsProvider>
       <div className="container mx-auto my-8">
         <TopCards />
-        <TransactionTable budget_id={params.budget_id} />
+        <TransactionTable />
       </div>
     </AccountsProvider>
   );
 };
-export default AccountsPage;
+export default Accounts;
 
 const TopCards = () => {
   const { accounts, balance, isPending, error } = useAccountsContext();

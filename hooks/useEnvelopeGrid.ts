@@ -3,10 +3,10 @@ import { useEnvelopes, type Envelope } from "@/hooks/useEnvelopes";
 import type { Error } from "@/components/ErrorAlert";
 import { useBudgetBalanceContext } from "@/contexts/BudgetBalanceContext";
 
-export const useEnvelopeGrid = (budget_id: number) => {
+export const useEnvelopeGrid = () => {
   const { budgetBalance, setBudgetBalance } = useBudgetBalanceContext();
   const { envelopes, upsertEnvelope, deleteEnvelope, isPending } =
-    useEnvelopes(budget_id);
+    useEnvelopes();
 
   const [saved, setSaved] = useState<Envelope[]>([]);
   const [data, setData] = useState<Envelope[]>([]);
@@ -25,7 +25,6 @@ export const useEnvelopeGrid = (budget_id: number) => {
         ...rows,
         {
           id: undefined,
-          budget_id,
           name: "",
           description: null,
           budgeted: 0,

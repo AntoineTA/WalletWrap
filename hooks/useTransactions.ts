@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import type { Error } from "@/components/ErrorAlert";
 import { createClient } from "@/utils/supabase/client";
+import { useSession } from "@/hooks/useSession";
+import type { Error } from "@/components/ErrorAlert";
 
 export type Transaction = {
   id: number | undefined;
@@ -13,7 +14,10 @@ export type Transaction = {
   local_id?: number;
 };
 
-export const useTransactions = (budget_id: number) => {
+export const useTransactions = () => {
+  const supabase = createClient();
+
+  const { getBudgetId } = useSession();
   const [error, setError] = useState<Error | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -24,7 +28,7 @@ export const useTransactions = (budget_id: number) => {
       setError(null);
       setIsPending(true);
 
-      const supabase = createClient();
+      const budget_id = await getBudgetId();
 
       const { data, error } = await supabase
         .from("accounts")
@@ -47,7 +51,7 @@ export const useTransactions = (budget_id: number) => {
 
       setTransactions(transactions);
     })();
-  }, [budget_id]);
+  }, []);
 
   const upsertTransaction = async (transaction: Transaction) => {
     const supabase = createClient();

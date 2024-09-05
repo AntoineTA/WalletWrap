@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import type { Error } from "@/components/ErrorAlert";
 import { createClient } from "@/utils/supabase/client";
+import { useSession } from "@/hooks/useSession";
+import type { Error } from "@/components/ErrorAlert";
 
 export type Account = {
   id: number | undefined;
-  budget_id: number;
   starting_balance: number;
   name: string;
   balance: number;
   type: string;
 };
 
-export const useAccounts = (budget_id: number) => {
+export const useAccounts = () => {
+  const supabase = createClient();
+  const { getBudgetId } = useSession();
   const [error, setError] = useState<Error | null>(null);
   const [isPending, setIsPending] = useState(true);
   const [accounts, setAccounts] = useState<Account[] | undefined>();
@@ -23,7 +25,7 @@ export const useAccounts = (budget_id: number) => {
       setError(null);
       setIsPending(true);
 
-      const supabase = createClient();
+      const budget_id = await getBudgetId();
 
       const { data } = await supabase
         .from("accounts_view")
@@ -41,7 +43,7 @@ export const useAccounts = (budget_id: number) => {
       }
       setAccounts(data);
     })();
-  }, [budget_id]);
+  }, []);
 
   // get balance
   useEffect(() => {
@@ -60,7 +62,7 @@ export const useAccounts = (budget_id: number) => {
     setError(null);
     setIsPending(true);
 
-    const supabase = createClient();
+    const budget_id = await getBudgetId();
 
     const { error } = await supabase
       .from("accounts")

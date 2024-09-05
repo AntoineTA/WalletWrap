@@ -8,17 +8,17 @@ import {
   useBudgetBalanceContext,
 } from "@/contexts/BudgetBalanceContext";
 
-const BudgetPage = ({ params }: { params: { budget_id: number } }) => {
+const Budget = () => {
   return (
-    <BudgetBalanceProvider budget_id={params.budget_id}>
+    <BudgetBalanceProvider>
       <div className="container mx-auto my-8">
         <TopCards />
-        <EnvelopeGrid budget_id={params.budget_id} />
+        <EnvelopeGrid />
       </div>
     </BudgetBalanceProvider>
   );
 };
-export default BudgetPage;
+export default Budget;
 
 const TopCards = () => {
   const { error, isPending, budgetBalance } = useBudgetBalanceContext();

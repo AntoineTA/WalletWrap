@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-import Logo from "@/components/Logo";
-import AuthWidget from "@/components/AuthWidget";
+import { Logo } from "@/components/Logo";
+import { AuthWidget } from "@/components/AuthWidget";
 
 const Landing = () => {
   return (

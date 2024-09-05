@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Wallet } from "lucide-react";
 
-const Branding = () => {
+export const Logo = () => {
   return (
     <Link href="/" className="flex items-center">
       <Wallet className="h-8 w-8" />
@@ -9,4 +9,3 @@ const Branding = () => {
     </Link>
   );
 };
-export default Branding;

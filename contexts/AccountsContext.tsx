@@ -18,14 +18,12 @@ const AccountsContext = createContext<AccountsContextProps | undefined>(
 );
 
 export const AccountsProvider = ({
-  budget_id,
   children,
 }: {
-  budget_id: number;
   children: React.ReactNode;
 }) => {
   return (
-    <AccountsContext.Provider value={useAccounts(budget_id)}>
+    <AccountsContext.Provider value={useAccounts()}>
       {children}
     </AccountsContext.Provider>
   );

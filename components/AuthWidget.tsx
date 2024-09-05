@@ -1,16 +1,45 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { useSession } from "@/hooks/useSession";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/utils/supabase/server";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const AuthWidget = async () => {
-  const supabase = createClient();
-  const { data } = await supabase.auth.getSession();
+export const AuthWidget = () => {
+  const { getIsAuth } = useSession();
+  const [isPending, setIsPending] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<Boolean>();
 
-  if (data.session?.user) {
+  useEffect(() => {
+    (async () => {
+      setIsPending(true);
+      setIsAuthenticated(await getIsAuth());
+      setIsPending(false);
+    })();
+  }, []);
+
+  const handleClick = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.reload();
+  };
+
+  if (isPending) {
+    return <Skeleton className="w-24 h-10" />;
+  }
+
+  if (isAuthenticated) {
     return (
-      <Button asChild>
-        <Link href="/budget">My Budget</Link>
-      </Button>
+      <div className="flex gap-4">
+        <Button asChild>
+          <Link href="/budget">My Budget</Link>
+        </Button>
+        <Button onClick={handleClick} variant="secondary">
+          Logout
+        </Button>
+      </div>
     );
   } else {
     return (
@@ -25,4 +54,3 @@ const AuthWidget = async () => {
     );
   }
 };
-export default AuthWidget;

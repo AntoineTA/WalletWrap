@@ -14,14 +14,12 @@ const BudgetBalanceContext = createContext<
 >(undefined);
 
 export const BudgetBalanceProvider = ({
-  budget_id,
   children,
 }: {
-  budget_id: number;
   children: React.ReactNode;
 }) => {
   return (
-    <BudgetBalanceContext.Provider value={useBudgetBalance(budget_id)}>
+    <BudgetBalanceContext.Provider value={useBudgetBalance()}>
       {children}
     </BudgetBalanceContext.Provider>
   );
