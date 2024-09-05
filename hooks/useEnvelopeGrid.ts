@@ -1,22 +1,29 @@
 import { useState, useEffect } from "react";
-import type { Envelope } from "@/hooks/useEnvelopes";
+import { useEnvelopes, type Envelope } from "@/hooks/useEnvelopes";
+import type { Error } from "@/components/ErrorAlert";
 
-export const useEnvelopeGrid = (envelopes: Envelope[]) => {
+export const useEnvelopeGrid = (budget_id: number) => {
+  const { envelopes, upsertEnvelope, deleteEnvelope, isPending } =
+    useEnvelopes(budget_id);
+
   const [saved, setSaved] = useState<Envelope[]>([]);
   const [data, setData] = useState<Envelope[]>([]);
+  const [error, setError] = useState<Error | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
+  // Get table data
   useEffect(() => {
     setSaved(envelopes);
     setData(envelopes);
   }, [envelopes]);
 
-  const createCard = (budget_id: number) => {
-    setData((cards) => {
+  const addRow = () => {
+    setData((rows) => {
       return [
-        ...cards,
+        ...rows,
         {
           id: undefined,
-          budget_id: budget_id,
+          budget_id,
           name: "",
           description: null,
           budgeted: 0,
@@ -25,36 +32,111 @@ export const useEnvelopeGrid = (envelopes: Envelope[]) => {
         },
       ];
     });
+
+    //set the new row to be in edit mode
+    setEditingIndex(data.length);
   };
 
-  const updateField = (
-    index: number,
-    field: string,
-    updatedValue: string | number,
-  ) => {
-    setData((cards) => {
-      return cards.map((card, i) => {
-        if (i === index) {
+  const editRow = (rowIndex: number) => {
+    revertChanges();
+    setEditingIndex(rowIndex);
+  };
+
+  const updateCell = (rowIndex: number, columnId: string, value: unknown) => {
+    setData((rows) => {
+      return rows.map((row, index) => {
+        if (index === rowIndex) {
           return {
-            ...card,
-            [field]: updatedValue,
+            ...row,
+            [columnId]: value,
           };
         }
-        return card;
+        return row;
       });
     });
   };
 
-  const loadSaved = () => {
+  const revertChanges = () => {
     setData(saved);
+    setEditingIndex(null);
   };
 
-  const deleteCard = (index: number) => {
-    setData((cards) => {
-      return cards.filter((card, i) => i !== index);
+  const saveRow = (rowIndex: number) => {
+    const newRow = data[rowIndex];
+    const oldRow = saved[rowIndex];
+
+    // save locally
+    setSaved(data);
+
+    // save to db
+    upsertEnvelope(newRow)
+      .then((upserted) => {
+        // if the upserted row was new, we update the id with the one from the db
+        if (newRow.id === undefined && upserted) {
+          updateId(newRow, upserted.id);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        setError({
+          title: "An error occured while saving the envelope",
+          message: "Please try again later",
+        });
+      });
+
+    // update local budget balance
+
+    setEditingIndex(null);
+  };
+
+  const removeRow = (rowIndex: number) => {
+    const removedRow = data[rowIndex];
+
+    // Remove locally
+    setData((rows) => {
+      return rows.filter((row, index) => index !== rowIndex);
     });
     setSaved(data);
+
+    // if the row exists in the db, we remove it
+    if (removedRow.id) {
+      deleteEnvelope(removedRow.id);
+    }
+
+    // update local budget balance
   };
 
-  return { data, saved, createCard, updateField, loadSaved, deleteCard };
+  const updateId = (rowToUpdate: Envelope, updatedId: number) => {
+    // We change the relevant row, to not erease data.
+    setData((rows) => {
+      return rows.map((row) => {
+        if (row.local_id === rowToUpdate.local_id) {
+          return { ...row, id: updatedId };
+        }
+        return row;
+      });
+    });
+    setSaved((rows) => {
+      return rows.map((row) => {
+        if (row.local_id === rowToUpdate.local_id) {
+          return { ...row, id: updatedId };
+        }
+        return row;
+      });
+    });
+  };
+
+  return {
+    data,
+    saved,
+    editingIndex,
+    addRow,
+    editRow,
+    updateCell,
+    revertChanges,
+    saveRow,
+    removeRow,
+    error,
+    isPending,
+  };
 };

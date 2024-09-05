@@ -21,23 +21,19 @@ import { EditMenu } from "./EditMenu";
 import { NumberField, TextField } from "./InputCells";
 import { columns } from "./columns";
 
-type EnvelopeGridProps = {
-  budget_id: number;
-  budgetBalance: number | undefined;
-  setBudgetBalance: (balance: number) => void;
-};
-
-export const EnvelopeGrid = ({
-  budget_id,
-  budgetBalance,
-  setBudgetBalance,
-}: EnvelopeGridProps) => {
-  const { error, isPending, envelopes, saveEnvelope, deleteEnvelope } =
-    useEnvelopes(budget_id);
-  const { data, saved, createCard, updateField, loadSaved, deleteCard } =
-    useEnvelopeGrid(envelopes);
-
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+export const EnvelopeGrid = ({ budget_id }: { budget_id: number }) => {
+  const {
+    data,
+    editingIndex,
+    addRow,
+    editRow,
+    updateCell,
+    revertChanges,
+    saveRow,
+    removeRow,
+    isPending,
+    error,
+  } = useEnvelopeGrid(budget_id);
 
   const table = useReactTable({
     columns,
@@ -45,43 +41,12 @@ export const EnvelopeGrid = ({
     getCoreRowModel: getCoreRowModel(),
     meta: {
       editingIndex,
-      addRow: () => {
-        createCard(budget_id);
-        setEditingIndex(data.length);
-      },
-      updateCell: (rowIndex, columnId, value) => {
-        updateField(rowIndex, columnId, value);
-      },
-      revertChanges: () => {
-        loadSaved();
-        setEditingIndex(null);
-      },
-      saveRow: (rowIndex) => {
-        const oldCard = saved[rowIndex] ?? null;
-        const newCard = data[rowIndex];
-
-        saveEnvelope(newCard);
-
-        // update local budget balance
-        if (budgetBalance !== undefined) {
-          const diff = oldCard
-            ? oldCard.budgeted - newCard.budgeted
-            : newCard.budgeted;
-          setBudgetBalance(budgetBalance - diff);
-        }
-
-        setEditingIndex(null);
-      },
-      removeRow: (rowIndex) => {
-        const removedCard = data[rowIndex];
-
-        removedCard.id ? deleteEnvelope(removedCard.id) : deleteCard(rowIndex);
-
-        // update local balance
-        if (budgetBalance !== undefined) {
-          setBudgetBalance(budgetBalance + removedCard.budgeted);
-        }
-      },
+      addRow,
+      editRow,
+      updateCell,
+      revertChanges,
+      saveRow,
+      removeRow,
     },
   });
 
@@ -94,8 +59,10 @@ export const EnvelopeGrid = ({
 
       {!error && (
         <div className="flex items-center py-4">
-          <AddRowButton table={table} disabled={isPending} />
-          {editingIndex !== null ? <CancelButton table={table} /> : null}
+          {editingIndex === null && (
+            <AddRowButton table={table} disabled={isPending} />
+          )}
+          {editingIndex !== null && <CancelButton table={table} />}
         </div>
       )}
 

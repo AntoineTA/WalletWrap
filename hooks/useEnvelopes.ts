@@ -43,32 +43,20 @@ export const useEnvelopes = (budget_id: number) => {
     })();
   }, [budget_id]);
 
-  const saveEnvelope = async (envelope: Envelope) => {
+  const upsertEnvelope = async (envelope: Envelope) => {
     const supabase = createClient();
 
-    // remove the irrelevant fields
     const { local_id, spent, ...inbound } = envelope;
 
-    const { data, error } = await supabase
+    const { data: upserted, error } = await supabase
       .from("envelopes")
       .upsert(inbound, { onConflict: "id", ignoreDuplicates: false })
       .select()
       .single();
 
-    if (error) {
-      setError({
-        title: "We could not save the envelope",
-        message: error.message,
-        code: error.code,
-      });
-      return;
-    }
+    if (!upserted) throw error;
 
-    // If the envelope was new
-    if (!envelope.id) {
-      // update the local state with the new record
-      setEnvelopes((old) => [...old, { ...data, spent, local_id }]);
-    }
+    return upserted;
   };
 
   const deleteEnvelope = async (id: number) => {
@@ -79,19 +67,16 @@ export const useEnvelopes = (budget_id: number) => {
     if (error) {
       setError({
         title: "We could not delete the envelope",
-        message: error.message,
-        code: error.code,
+        message: "Please try again later",
       });
     }
-    // remove the envelope from local state
-    setEnvelopes((old) => old.filter((e) => e.id !== id));
   };
 
   return {
     error,
     isPending,
     envelopes,
-    saveEnvelope,
+    upsertEnvelope,
     deleteEnvelope,
   };
 };

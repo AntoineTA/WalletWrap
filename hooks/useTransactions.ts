@@ -52,14 +52,6 @@ export const useTransactions = (budget_id: number) => {
   const upsertTransaction = async (transaction: Transaction) => {
     const supabase = createClient();
 
-    if (!transaction.account_id) {
-      setError({
-        title: "We could not save the transaction",
-        message: "Account ID is required",
-      });
-      return;
-    }
-
     const { local_id, ...inbound } = transaction;
 
     const { data: upserted, error } = await supabase

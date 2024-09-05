@@ -1,5 +1,4 @@
-import type { Envelope } from "./EnvelopeGrid";
-import type { Table, Row } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,16 +6,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Check, MoreHorizontal } from "lucide-react";
+import type { Envelope } from "@/hooks/useEnvelopes";
+import type { Table, Row } from "@tanstack/react-table";
 
 type EditMenuProps = {
   row: Row<Envelope>;
   table: Table<Envelope>;
-};
-
-type DeleteDialogProps = {
-  isDeleting: boolean;
-  setIsDeleting: (isDeleting: boolean) => void;
 };
 
 export const EditMenu = ({ row, table }: EditMenuProps) => {
@@ -33,20 +28,10 @@ export const EditMenu = ({ row, table }: EditMenuProps) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => {
-                meta.revertChanges();
-                meta.setEditingIndex(row.index);
-              }}
-            >
+            <DropdownMenuItem onClick={() => meta.editRow(row.index)}>
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                meta.revertChanges();
-                meta.removeRow(row.index);
-              }}
-            >
+            <DropdownMenuItem onClick={() => meta.removeRow(row.index)}>
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

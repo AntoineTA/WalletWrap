@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { Transaction, useTransactions } from "@/hooks/useTransactions";
+import { type Transaction, useTransactions } from "@/hooks/useTransactions";
 import { useEnvelopes } from "./useEnvelopes";
-import { Account, useAccounts } from "./useAccounts";
-import type { Error } from "@/components/ErrorAlert";
 import { useAccountsContext } from "@/contexts/AccountsContext";
+import type { Error } from "@/components/ErrorAlert";
 
 export type SelectOptions = {
   accounts: { id: number; label: string }[];
@@ -189,9 +188,10 @@ export const useTransactionTable = (budget_id: number) => {
     });
     setSaved(data);
 
-    // remove from db
-    if (!removedRow.id) return; // if the row was never saved to db, we don't need to delete it
-    deleteTransaction(removedRow.id);
+    // if the row exists in the db, we remove it
+    if (removedRow.id) {
+      deleteTransaction(removedRow.id);
+    }
 
     // update local account balance
     if (accounts === undefined) return;

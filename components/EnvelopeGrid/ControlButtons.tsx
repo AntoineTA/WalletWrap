@@ -11,13 +11,8 @@ type ControlButtonsProps = {
 export const AddRowButton = ({ table, disabled }: ControlButtonsProps) => {
   const meta = table.options.meta!;
 
-  const handleClick = () => {
-    meta.revertChanges();
-    meta.addRow();
-  };
-
   return (
-    <Button onClick={handleClick} variant="ghost" disabled={disabled}>
+    <Button onClick={meta.addRow} variant="ghost" disabled={disabled}>
       <Plus className="mr-2 h-4 w-4" />
       Add Envelope
     </Button>
