@@ -54,5 +54,27 @@ export const useAccounts = (budget_id: number) => {
     setBalance(balance);
   }, [accounts]);
 
-  return { accounts, balance, error, isPending, setAccounts };
+  const insertAccount = async (
+    account: Omit<Account, "budget_id" | "balance">,
+  ) => {
+    setError(null);
+    setIsPending(true);
+
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from("accounts")
+      .insert({ ...account, budget_id });
+
+    setIsPending(false);
+
+    if (error) {
+      setError({
+        title: "We could not add the account",
+        message: "Please try again later",
+      });
+    }
+  };
+
+  return { accounts, setAccounts, balance, insertAccount, error, isPending };
 };

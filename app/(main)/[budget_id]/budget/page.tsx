@@ -1,4 +1,5 @@
 "use client";
+
 import { useBudgetBalance } from "@/hooks/useBudgetBalance";
 import { BudgetBalanceCard, SkeletonCard } from "@/components/BudgetCards";
 import { EnvelopeGrid } from "@/components/EnvelopeGrid/EnvelopeGrid";

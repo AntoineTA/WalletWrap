@@ -4,26 +4,33 @@ import { Transaction, useTransactions } from "@/hooks/useTransactions";
 import { useEnvelopes } from "./useEnvelopes";
 import { Account, useAccounts } from "./useAccounts";
 import type { Error } from "@/components/ErrorAlert";
+import { useAccountsContext } from "@/contexts/AccountsContext";
 
 export type SelectOptions = {
   accounts: { id: number; label: string }[];
   envelopes: { id: number; label: string }[];
 };
 
-export const useTransactionTable = (
-  budget_id: number,
-  accounts: Account[],
-  setAccounts: (accounts: Account[]) => void,
-) => {
+export const useTransactionTable = (budget_id: number) => {
+  const {
+    accounts,
+    setAccounts,
+    isPending: accountsIsPending,
+    error: accountsError,
+  } = useAccountsContext();
   const {
     transactions,
     upsertTransaction,
     deleteTransaction,
     deleteTransactions,
-    ...transactionsStatus
+    isPending: transactionsIsPending,
+    error: transactionsError,
   } = useTransactions(budget_id);
-  const { envelopes, ...envelopesStatus } = useEnvelopes(budget_id);
-  const { ...accountsStatus } = useAccounts(budget_id);
+  const {
+    envelopes,
+    isPending: envelopesIsPending,
+    error: envelopesError,
+  } = useEnvelopes(budget_id);
 
   const [saved, setSaved] = useState<Transaction[]>([]);
   const [data, setData] = useState<Transaction[]>([]);
@@ -61,29 +68,21 @@ export const useTransactionTable = (
 
   // Define isPending
   useEffect(() => {
-    const isPending =
-      transactionsStatus.isPending ||
-      envelopesStatus.isPending ||
-      accountsStatus.isPending;
-    setIsPending(isPending);
-  }, [
-    transactionsStatus.isPending,
-    envelopesStatus.isPending,
-    accountsStatus.isPending,
-  ]);
+    setIsPending(
+      accountsIsPending || transactionsIsPending || envelopesIsPending,
+    );
+  }, [accountsIsPending || transactionsIsPending || envelopesIsPending]);
 
   // Define error
   useEffect(() => {
-    const error =
-      transactionsStatus.error || envelopesStatus.error || accountsStatus.error;
-    if (error) {
+    if (transactionsError || envelopesError || accountsError) {
       console.error(error);
       setError({
         title: "An error occurred",
         message: "Please try again later",
       });
     }
-  }, [transactionsStatus.error, envelopesStatus.error, accountsStatus.error]);
+  }, [transactionsError || envelopesError || accountsError]);
 
   const addRow = () => {
     if (!selectOptions || selectOptions.accounts.length === 0) {
@@ -158,6 +157,7 @@ export const useTransactionTable = (
         });
       });
 
+    if (accounts === undefined) return;
     // update account balance
     let diff = 0;
     // If the row was updated, we calculate the difference between the old and new inflow/outflow
@@ -194,6 +194,7 @@ export const useTransactionTable = (
     deleteTransaction(removedRow.id);
 
     // update local account balance
+    if (accounts === undefined) return;
     const diff = (removedRow.inflow || 0) - (removedRow.outflow || 0);
     const updatedAccounts = accounts.map((account) => {
       if (account.id === removedRow.account_id) {
@@ -222,6 +223,7 @@ export const useTransactionTable = (
     }
 
     // update local account balance
+    if (accounts === undefined) return;
     const diff = removedRows.reduce((acc, row) => {
       return acc + ((row.inflow || 0) - (row.outflow || 0));
     }, 0);

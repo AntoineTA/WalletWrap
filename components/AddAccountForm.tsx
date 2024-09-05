@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -25,20 +28,39 @@ import {
 } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { ErrorAlert } from "@/components/ErrorAlert";
-import { useAccountForm } from "@/hooks/useAccountForm";
+import { useAccountsContext } from "@/contexts/AccountsContext";
 
 type AddAccountFormProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
-  budget_id: number;
 };
 
-export const AddAccountForm = ({
-  open,
-  setOpen,
-  budget_id,
-}: AddAccountFormProps) => {
-  const { error, isPending, form, createAccount } = useAccountForm(budget_id);
+export const formSchema = z.object({
+  name: z.string(),
+  type: z.string(),
+  starting_balance: z.coerce.number(),
+});
+
+export const AddAccountForm = ({ open, setOpen }: AddAccountFormProps) => {
+  const { error, isPending, insertAccount } = useAccountsContext();
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      type: "checking",
+      starting_balance: 0,
+    },
+    mode: "onTouched",
+  });
+
+  const createAccount = async (values: z.infer<typeof formSchema>) => {
+    await insertAccount({ ...values, id: undefined });
+    if (!error) {
+      form.reset();
+      setOpen(false);
+    }
+    location.reload();
+  };
 
   return (
     <Dialog open={open} onOpenChange={() => setOpen(false)}>

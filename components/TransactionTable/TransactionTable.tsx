@@ -22,19 +22,8 @@ import {
 import { useTransactionTable } from "@/hooks/useTransactionTable";
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { columns } from "./columns";
-import type { Account } from "@/hooks/useAccounts";
 
-type TransactionTableProps = {
-  budget_id: number;
-  accounts: Account[];
-  setAccounts: (accounts: Account[]) => void;
-};
-
-export function TransactionTable({
-  budget_id,
-  accounts,
-  setAccounts,
-}: TransactionTableProps) {
+export function TransactionTable({ budget_id }: { budget_id: number }) {
   const {
     data,
     selectOptions,
@@ -48,7 +37,7 @@ export function TransactionTable({
     removeRows,
     isPending,
     error,
-  } = useTransactionTable(budget_id, accounts, setAccounts);
+  } = useTransactionTable(budget_id);
 
   const table = useReactTable({
     columns,
@@ -71,18 +60,20 @@ export function TransactionTable({
 
   return (
     <div>
-      {error && <ErrorAlert {...error} />}
+      <div className="flex items-center py-4">
+        {editingIndex === null && (
+          <AddRowButton table={table} disabled={isPending} />
+        )}
+        {editingIndex !== null && <SaveButton table={table} />}
+        {editingIndex !== null && <CancelButton table={table} />}
+        {table.getSelectedRowModel().rows.length > 0 && (
+          <RemoveRowsButton table={table} />
+        )}
+      </div>
 
-      {!error && (
-        <div className="flex items-center py-4">
-          {editingIndex === null && (
-            <AddRowButton table={table} disabled={isPending} />
-          )}
-          {editingIndex !== null && <SaveButton table={table} />}
-          {editingIndex !== null && <CancelButton table={table} />}
-          {table.getSelectedRowModel().rows.length > 0 && (
-            <RemoveRowsButton table={table} />
-          )}
+      {error && (
+        <div className="mb-4">
+          <ErrorAlert {...error} />
         </div>
       )}
 

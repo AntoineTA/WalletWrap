@@ -1,5 +1,6 @@
 "use client";
 
+import { Equal } from "lucide-react";
 import {
   AccountInfoCard,
   BalanceCard,
@@ -7,60 +8,39 @@ import {
   SkeletonCard,
 } from "@/components/AccountCards";
 import { ErrorAlert } from "@/components/ErrorAlert";
-import { Equal } from "lucide-react";
-import { useAccounts } from "@/hooks/useAccounts";
 import { TransactionTable } from "@/components/TransactionTable/TransactionTable";
+import {
+  AccountsProvider,
+  useAccountsContext,
+} from "@/contexts/AccountsContext";
 
-const Accounts = ({ params }: { params: { budget_id: number } }) => {
-  const { accounts, balance, error, isPending, setAccounts } = useAccounts(
-    params.budget_id,
-  );
-
+const AccountsPage = ({ params }: { params: { budget_id: number } }) => {
   return (
-    <div className="container mx-auto my-8">
-      {error && <ErrorAlert {...error} />}
-      <div className="flex justify-start items-center gap-4">
-        {isPending && <SkeletonCard />}
-        {balance !== undefined && <BalanceCard balance={balance} />}
-        <Equal size={24} />
-        {isPending && <SkeletonCard />}
-        {accounts &&
-          accounts.map((account) => (
-            <AccountInfoCard key={account.id} account={account} />
-          ))}
-        <AddAccountButton budget_id={params.budget_id} />
+    <AccountsProvider budget_id={params.budget_id}>
+      <div className="container mx-auto my-8">
+        <TopCards />
+        <TransactionTable budget_id={params.budget_id} />
       </div>
-      {accounts && (
-        <TransactionTable
-          budget_id={params.budget_id}
-          accounts={accounts}
-          setAccounts={setAccounts}
-        />
-      )}
-    </div>
-    // <div className="container mx-auto my-8">
-    //   <div className="my-8">
-    //     {error && <ErrorAlert {...error} />}
-    //     <div className="flex justify-start items-center gap-4">
-    //       <BalanceCard balance={balance} />
-    //       <Equal size={24} />
-    //       {accounts ? (
-    //         accounts.map((account) => (
-    //           <AccountInfoCard key={account.id} account={account} />
-    //         ))
-    //       ) : (
-    //         <SkeletonAccountInfoCard />
-    //       )}
-    //       <AddAccountButton budget_id={params.budget_id} />
-    //     </div>
-    //   </div>
-    //   <TransactionTable
-    //     budget_id={params.budget_id}
-    //     columns={columns}
-    //     balance={balance}
-    //     setBalance={setBalance}
-    //   />
-    // </div>
+    </AccountsProvider>
   );
 };
-export default Accounts;
+export default AccountsPage;
+
+const TopCards = () => {
+  const { accounts, balance, isPending, error } = useAccountsContext();
+
+  return (
+    <div className="flex justify-start items-center gap-4">
+      {error && <ErrorAlert {...error} />}
+      {isPending && <SkeletonCard />}
+      {balance !== undefined && <BalanceCard balance={balance} />}
+      <Equal size={24} />
+      {isPending && <SkeletonCard />}
+      {accounts &&
+        accounts.map((account) => (
+          <AccountInfoCard key={account.id} account={account} />
+        ))}
+      <AddAccountButton />
+    </div>
+  );
+};

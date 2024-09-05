@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Plus } from "lucide-react";
 import {
   Card,
@@ -46,7 +46,7 @@ export const AccountInfoCard = ({ account }: { account: Account }) => {
   );
 };
 
-export const AddAccountButton = ({ budget_id }: { budget_id: number }) => {
+export const AddAccountButton = () => {
   const [isAdding, setIsAdding] = useState(false);
 
   return (
@@ -60,11 +60,7 @@ export const AddAccountButton = ({ budget_id }: { budget_id: number }) => {
           New Account
         </span>
       </Card>
-      <AddAccountForm
-        open={isAdding}
-        setOpen={setIsAdding}
-        budget_id={budget_id}
-      />
+      <AddAccountForm open={isAdding} setOpen={setIsAdding} />
     </div>
   );
 };
