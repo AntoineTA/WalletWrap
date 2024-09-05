@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useEnvelopes, type Envelope } from "@/hooks/useEnvelopes";
 import type { Error } from "@/components/ErrorAlert";
+import { useBudgetBalanceContext } from "@/contexts/BudgetBalanceContext";
 
 export const useEnvelopeGrid = (budget_id: number) => {
+  const { budgetBalance, setBudgetBalance } = useBudgetBalanceContext();
   const { envelopes, upsertEnvelope, deleteEnvelope, isPending } =
     useEnvelopes(budget_id);
 
@@ -85,6 +87,16 @@ export const useEnvelopeGrid = (budget_id: number) => {
       });
 
     // update local budget balance
+    if (budgetBalance !== undefined) {
+      let diff = 0;
+      // if the row was updated, we calculate the difference between the old and new budgeted amount
+      if (oldRow && oldRow.id === newRow.id) {
+        diff = newRow.budgeted - oldRow.budgeted;
+      } else {
+        diff = newRow.budgeted;
+      }
+      setBudgetBalance(budgetBalance - diff);
+    }
 
     setEditingIndex(null);
   };
@@ -104,6 +116,9 @@ export const useEnvelopeGrid = (budget_id: number) => {
     }
 
     // update local budget balance
+    if (budgetBalance !== undefined) {
+      setBudgetBalance(budgetBalance + removedRow.budgeted);
+    }
   };
 
   const updateId = (rowToUpdate: Envelope, updatedId: number) => {

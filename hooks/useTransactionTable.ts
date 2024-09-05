@@ -156,25 +156,26 @@ export const useTransactionTable = (budget_id: number) => {
         });
       });
 
-    if (accounts === undefined) return;
     // update account balance
-    let diff = 0;
-    // If the row was updated, we calculate the difference between the old and new inflow/outflow
-    if (oldRow && oldRow.id === newRow.id) {
-      const diffInflow = (newRow.inflow || 0) - (oldRow.inflow || 0);
-      const diffOutflow = (newRow.outflow || 0) - (oldRow.outflow || 0);
-      diff = diffInflow - diffOutflow;
-    } else {
-      // we get the difference between the current inflow and outflow
-      diff = (newRow.inflow || 0) - (newRow.outflow || 0);
-    }
-    const updatedAccounts = accounts.map((account) => {
-      if (account.id === newRow.account_id) {
-        return { ...account, balance: account.balance + diff };
+    if (accounts !== undefined) {
+      let diff = 0;
+      // If the row was updated, we calculate the difference between the old and new inflow/outflow
+      if (oldRow && oldRow.id === newRow.id) {
+        const diffInflow = (newRow.inflow || 0) - (oldRow.inflow || 0);
+        const diffOutflow = (newRow.outflow || 0) - (oldRow.outflow || 0);
+        diff = diffInflow - diffOutflow;
+      } else {
+        // we get the difference between the current inflow and outflow
+        diff = (newRow.inflow || 0) - (newRow.outflow || 0);
       }
-      return account;
-    });
-    setAccounts(updatedAccounts);
+      const updatedAccounts = accounts.map((account) => {
+        if (account.id === newRow.account_id) {
+          return { ...account, balance: account.balance + diff };
+        }
+        return account;
+      });
+      setAccounts(updatedAccounts);
+    }
 
     setEditingIndex(null);
   };
@@ -194,15 +195,16 @@ export const useTransactionTable = (budget_id: number) => {
     }
 
     // update local account balance
-    if (accounts === undefined) return;
-    const diff = (removedRow.inflow || 0) - (removedRow.outflow || 0);
-    const updatedAccounts = accounts.map((account) => {
-      if (account.id === removedRow.account_id) {
-        return { ...account, balance: account.balance - diff };
-      }
-      return account;
-    });
-    setAccounts(updatedAccounts);
+    if (accounts !== undefined) {
+      const diff = (removedRow.inflow || 0) - (removedRow.outflow || 0);
+      const updatedAccounts = accounts.map((account) => {
+        if (account.id === removedRow.account_id) {
+          return { ...account, balance: account.balance - diff };
+        }
+        return account;
+      });
+      setAccounts(updatedAccounts);
+    }
   };
 
   const removeRows = (rowsIndices: number[]) => {
@@ -223,17 +225,18 @@ export const useTransactionTable = (budget_id: number) => {
     }
 
     // update local account balance
-    if (accounts === undefined) return;
-    const diff = removedRows.reduce((acc, row) => {
-      return acc + ((row.inflow || 0) - (row.outflow || 0));
-    }, 0);
-    const updatedAccounts = accounts.map((account) => {
-      if (removedRows.some((row) => row.account_id === account.id)) {
-        return { ...account, balance: account.balance - diff };
-      }
-      return account;
-    });
-    setAccounts(updatedAccounts);
+    if (accounts !== undefined) {
+      const diff = removedRows.reduce((acc, row) => {
+        return acc + ((row.inflow || 0) - (row.outflow || 0));
+      }, 0);
+      const updatedAccounts = accounts.map((account) => {
+        if (removedRows.some((row) => row.account_id === account.id)) {
+          return { ...account, balance: account.balance - diff };
+        }
+        return account;
+      });
+      setAccounts(updatedAccounts);
+    }
   };
 
   const updateId = (rowToUpdate: Transaction, updatedId: number) => {

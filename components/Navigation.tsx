@@ -6,7 +6,7 @@ import { WalletCards, HandCoins, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "/2", label: "Budget", icon: WalletCards },
+  { href: "/2/budget", label: "Budget", icon: WalletCards },
   { href: "/2/accounts", label: "Accounts", icon: HandCoins },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

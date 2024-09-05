@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/client";
 import type { Error } from "@/components/ErrorAlert";
 
 export const useBudgetBalance = (budget_id: number) => {
-  const [error, setError] = useState<Error | null>();
+  const [error, setError] = useState<Error | null>(null);
   const [isPending, setIsPending] = useState(true);
   const [budgetBalance, setBudgetBalance] = useState<number | undefined>();
 
