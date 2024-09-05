@@ -7,7 +7,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { ErrorAlert, Error } from "@/components/ui/error-alert";
+import { ErrorAlert, Error } from "@/components/ErrorAlert";
 
 import { createClient } from "@/utils/supabase/client";
 

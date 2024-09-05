@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ErrorAlert, Error } from "@/components/ui/error-alert";
+import { ErrorAlert, Error } from "@/components/ErrorAlert";
 
 import { createClient } from "@/utils/supabase/server";
 
@@ -43,7 +43,7 @@ const getSettings = async (): Promise<{
 
   // get the user's settings
   const { data, error } = await supabase
-    .from("Settings")
+    .from("settings")
     .select("username, has_mfa")
     .eq("id", user.id)
     .single();

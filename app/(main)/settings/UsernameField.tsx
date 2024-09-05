@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { ErrorAlert, Error } from "@/components/ui/error-alert";
+import { ErrorAlert, Error } from "@/components/ErrorAlert";
 import { useToast } from "@/components/ui/use-toast";
 
 import EditButton from "./EditButton";

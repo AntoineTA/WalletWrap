@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { ErrorAlert, type Error } from "@/components/ui/error-alert";
+import { ErrorAlert, type Error } from "@/components/ErrorAlert";
 
 import { createClient } from "@/utils/supabase/client";
 
@@ -36,7 +36,7 @@ export function UnenrollMFAForm() {
 
       // Update the user's MFA status in settings
       const { error: settingsError } = await supabase
-        .from("Settings")
+        .from("settings")
         .update({ has_mfa: false })
         .eq("id", user.id);
       if (settingsError) throw settingsError;

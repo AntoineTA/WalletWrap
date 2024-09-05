@@ -8,7 +8,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { ErrorAlert, type Error } from "@/components/ui/error-alert";
+import { ErrorAlert, type Error } from "@/components/ErrorAlert";
 import { Button } from "@/components/ui/button";
 
 import { createClient } from "@/utils/supabase/client";
@@ -46,7 +46,7 @@ const EnrollMFAForm = () => {
 
       // Update the user's MFA status in settings
       const { error: settingsError } = await supabase
-        .from("Settings")
+        .from("settings")
         .update({ has_mfa: true })
         .eq("id", user.id);
       if (settingsError) throw settingsError;
