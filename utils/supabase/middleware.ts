@@ -39,9 +39,7 @@ export async function updateSession(request: NextRequest) {
 
   if (
     !user &&
-    (request.nextUrl.pathname.startsWith("/api") ||
-      request.nextUrl.pathname.startsWith("/testapi") ||
-      request.nextUrl.pathname.startsWith("/budget") ||
+    (request.nextUrl.pathname.startsWith("/budget") ||
       request.nextUrl.pathname.startsWith("/accounts") ||
       request.nextUrl.pathname.startsWith("/settings"))
   ) {
