@@ -39,13 +39,14 @@ export async function updateSession(request: NextRequest) {
 
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/signup") &&
-    request.nextUrl.pathname !== "/"
+    (request.nextUrl.pathname.startsWith("/api") ||
+      request.nextUrl.pathname.startsWith("/testapi") ||
+      request.nextUrl.pathname.startsWith("/budget") ||
+      request.nextUrl.pathname.startsWith("/accounts") ||
+      request.nextUrl.pathname.startsWith("/settings"))
   ) {
-    console.log("redirecting to /");
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
@@ -56,9 +57,12 @@ export async function updateSession(request: NextRequest) {
   if (
     assurance &&
     assurance.nextLevel === "aal2" &&
-    assurance.nextLevel !== assurance.currentLevel
+    assurance.nextLevel !== assurance.currentLevel &&
+    !request.nextUrl.pathname.startsWith("/mfa/challenge")
   ) {
-    return NextResponse.redirect("/mfa/challenge");
+    const url = request.nextUrl.clone();
+    url.pathname = "/mfa/challenge";
+    return NextResponse.redirect(url);
   }
 
   if (
