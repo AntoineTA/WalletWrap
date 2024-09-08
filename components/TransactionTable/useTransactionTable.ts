@@ -71,8 +71,8 @@ export const useTransactionTable = () => {
       .filter((option) => option !== undefined);
 
     setSelectOptions({
-      accounts: accountOptions ?? { id: null, label: null },
-      envelopes: envelopeOptions ?? { id: null, label: null },
+      accounts: accountOptions,
+      envelopes: envelopeOptions,
     });
   }, [accounts, envelopes]);
 
