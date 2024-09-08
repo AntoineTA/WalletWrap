@@ -5,8 +5,8 @@ import {
   type Row,
 } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
-import { type Envelope, useEnvelopes } from "@/hooks/useEnvelopes";
-import { useEnvelopeGrid } from "@/hooks/useEnvelopeGrid";
+import { type Envelope } from "@/hooks/useEnvelopes";
+import { useEnvelopeGrid } from "./useEnvelopeGrid";
 import {
   Card,
   CardContent,

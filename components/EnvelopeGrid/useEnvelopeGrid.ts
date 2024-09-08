@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useEnvelopes, type Envelope } from "@/hooks/useEnvelopes";
-import type { Error } from "@/components/ErrorAlert";
 import { useBudgetBalanceContext } from "@/contexts/BudgetBalanceContext";
+import type { Error } from "@/components/ErrorAlert";
 
 export const useEnvelopeGrid = () => {
   const { budgetBalance, setBudgetBalance } = useBudgetBalanceContext();

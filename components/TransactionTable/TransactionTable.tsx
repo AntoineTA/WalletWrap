@@ -19,7 +19,7 @@ import {
   RemoveRowsButton,
   SaveButton,
 } from "./ControlButtons";
-import { useTransactionTable } from "@/hooks/useTransactionTable";
+import { useTransactionTable } from "./useTransactionTable";
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { columns } from "./columns";
 

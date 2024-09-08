@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { type Transaction, useTransactions } from "@/hooks/useTransactions";
-import { useEnvelopes } from "./useEnvelopes";
+import { useEnvelopes } from "@/hooks/useEnvelopes";
 import { useAccountsContext } from "@/contexts/AccountsContext";
 import type { Error } from "@/components/ErrorAlert";
 
@@ -40,6 +40,14 @@ export const useTransactionTable = () => {
 
   //Get table data
   useEffect(() => {
+    console.log("transactions");
+    if (!transactions) return;
+
+    // Sort by date descending
+    transactions.sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+
     setSaved(transactions);
     setData(transactions);
   }, [transactions]);
@@ -70,18 +78,17 @@ export const useTransactionTable = () => {
     setIsPending(
       accountsIsPending || transactionsIsPending || envelopesIsPending,
     );
-  }, [accountsIsPending || transactionsIsPending || envelopesIsPending]);
+  }, [accountsIsPending, transactionsIsPending, envelopesIsPending]);
 
   // Define error
   useEffect(() => {
     if (transactionsError || envelopesError || accountsError) {
-      console.error(error);
       setError({
         title: "An error occurred",
         message: "Please try again later",
       });
     }
-  }, [transactionsError || envelopesError || accountsError]);
+  }, [transactionsError, envelopesError, accountsError]);
 
   const addRow = () => {
     if (!selectOptions || selectOptions.accounts.length === 0) {
@@ -137,8 +144,14 @@ export const useTransactionTable = () => {
     const newRow = data[rowIndex];
     const oldRow = saved[rowIndex];
 
+    // sort the data by date descending
+    const sortedData = [...data].sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+
     // save locally
-    setSaved(data);
+    setSaved(sortedData);
+    setData(sortedData);
 
     // save to db
     upsertTransaction(newRow)
