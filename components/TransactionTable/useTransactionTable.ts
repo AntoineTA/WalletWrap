@@ -70,7 +70,10 @@ export const useTransactionTable = () => {
       })
       .filter((option) => option !== undefined);
 
-    setSelectOptions({ accounts: accountOptions, envelopes: envelopeOptions });
+    setSelectOptions({
+      accounts: accountOptions ?? { id: null, label: null },
+      envelopes: envelopeOptions ?? { id: null, label: null },
+    });
   }, [accounts, envelopes]);
 
   // Define isPending
